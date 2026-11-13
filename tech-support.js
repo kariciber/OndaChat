@@ -27,7 +27,7 @@ const catLabel = id => CATEGORIES.find(x => x[0] === id)?.[1] || '💡 Otras dud
 const authIsGoogle = user => !!user?.providerData?.some(provider => provider.providerId === 'google.com');
 
 export function mountTechSupport({container, firebaseContext, nickname}) {
-  let stopped = false, stopList = null, stopDetail = null, view = 'questions';
+  let stopped = false, stopList = null, stopDetail = null, stopQuestion = null, view = 'questions';
   let questionItems = [], lastPublish = 0, currentQuestionId = null;
   const ctx = firebaseContext;
   const user = ctx?.auth?.currentUser;
@@ -57,6 +57,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
   const disposeSubscriptions = () => {
     if (stopList) {stopList();stopList=null;}
     if (stopDetail) {stopDetail();stopDetail=null;}
+    if (stopQuestion) {stopQuestion();stopQuestion=null;}
     currentQuestionId = null;
   };
   const message = (txt, cls='') => {
@@ -135,7 +136,12 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
       filtered.forEach(q=>{
         const item=create('article','tech-question');
         const meta=create('div','tech-question-meta');
-        meta.append(create('span','tech-category',catLabel(q.category)),create('span','',clock(q.createdAt)));
+        const categoryLabel = create('span','tech-category',catLabel(q.category));
+        meta.append(categoryLabel, create('span','',clock(q.createdAt)));
+        if (q.status === 'resuelta') {
+          meta.append(create('span','tech-solved-label','✅ Resuelta'));
+          item.classList.add('tech-question-solved');
+        }
         const h=create('button','tech-question-title',short(q.title,120));
         h.type='button';h.addEventListener('click',()=>showThread(q.id, q));
         item.append(meta,h,create('p','tech-excerpt',short(q.details,170)));
@@ -179,52 +185,120 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
       if(!stopped&&view==='questions')list.replaceChildren(create('p','tech-empty','Las preguntas aún no están disponibles. Hay que publicar las reglas nuevas de Firebase.'));
     });
   }
-  function showThread(id,question) {
+  function showThread(id, question) {
     if (!ready) return;
-    if (stopDetail){stopDetail();stopDetail=null;}
-    currentQuestionId=id;
+    if (stopDetail) { stopDetail(); stopDetail = null; }
+    if (stopQuestion) { stopQuestion(); stopQuestion = null; }
+    currentQuestionId = id;
+
     content.replaceChildren();
-    const back=create('button','tech-back','← Volver a preguntas');
-    back.type='button';
-    back.addEventListener('click',()=>{disposeSubscriptions();renderQuestions();});
+    const back = create('button','tech-back','← Volver a preguntas');
+    back.type = 'button';
+    back.addEventListener('click', () => {
+      disposeSubscriptions();
+      renderQuestions();
+    });
     content.append(back);
-    const card=create('article','tech-question opened');
+
+    const card = create('article','tech-question opened');
+    const solvedBanner = create('div','tech-solved-banner','✅ Pregunta resuelta');
+    solvedBanner.hidden = true;
     card.append(create('span','tech-category',catLabel(question.category)),
       create('h4','tech-thread-title',short(question.title,120)),
       create('p','tech-full-description',short(question.details,1200)),
-      create('p','tech-question-by','Por '+short(question.nickname,24)+' · '+clock(question.createdAt)));
+      create('p','tech-question-by','Por '+short(question.nickname,24)+' · '+clock(question.createdAt)),
+      solvedBanner);
     content.append(card,create('h4','tech-section-title','Respuestas de la comunidad'));
-    const answers=create('div','tech-answer-list');
+
+    const answers = create('div','tech-answer-list');
     answers.append(create('p','tech-empty','Cargando respuestas...'));
     content.append(answers);
-    const form=create('form','tech-answer-form');
-    const input=create('textarea','');
+
+    const form = create('form','tech-answer-form');
+    const input = create('textarea','');
     input.rows=3;input.minLength=10;input.maxLength=800;input.required=true;
     input.placeholder='Comparte los pasos que podrían ayudar a resolver este problema...';
     input.setAttribute('aria-label','Tu respuesta');
     const btn=create('button','tech-primary','Enviar respuesta');btn.type='submit';
     const feedback=create('p','tech-feedback','');
     form.append(input,btn,feedback);content.append(form);
+
     const {dbApi,db}=ctx;
-    const ref=dbApi.collection(db,'techQuestions',id,'answers');
-    const q=dbApi.query(ref,dbApi.orderBy('createdAt','asc'),dbApi.limit(80));
-    stopDetail=dbApi.onSnapshot(q,snapshot=>{
-      if(stopped||currentQuestionId!==id) return;
+    const questionRef=dbApi.doc(db,'techQuestions',id);
+    const answersRef=dbApi.collection(db,'techQuestions',id,'answers');
+    const q=dbApi.query(answersRef,dbApi.orderBy('createdAt','asc'),dbApi.limit(80));
+    let currentQuestion={...question}, loadedAnswers=null;
+
+    const renderAnswers=()=>{
+      solvedBanner.hidden=currentQuestion.status!=='resuelta';
+      if (!loadedAnswers) return;
       answers.replaceChildren();
-      if(snapshot.empty){answers.append(create('p','tech-empty','Todavía no hay respuestas. ¿Sabes cómo ayudar?'));return;}
-      snapshot.docs.forEach(doc=>{
-        const data=doc.data(), article=create('article','tech-answer');
+      if (loadedAnswers.empty) {
+        answers.append(create('p','tech-empty','Todavía no hay respuestas. ¿Sabes cómo ayudar?'));
+        return;
+      }
+      loadedAnswers.docs.forEach(doc=>{
+        const data=doc.data();
+        const accepted=currentQuestion.status==='resuelta' &&
+          currentQuestion.solutionAnswerId===doc.id;
+        const article=create('article','tech-answer');
+        if (accepted) {
+          article.classList.add('tech-accepted-answer');
+          article.append(create('div','tech-solved-banner','✅ Solución aceptada'));
+        }
         const head=create('div','tech-question-foot');
         head.append(create('strong','',short(data.nickname,24)),create('span','',clock(data.createdAt)));
         article.append(head,create('p','',short(data.text,800)));
-        const b=reportButton('answer',doc.id,data.uid);
-        if(b)article.append(b);
+
+        // Solo el autor de la pregunta puede elegir una solución.
+        if (currentQuestion.uid===user.uid && !accepted) {
+          const acceptBtn=create('button','tech-solve-button','✓ Marcar como solución');
+          acceptBtn.type='button';
+          acceptBtn.addEventListener('click',async ()=>{
+            acceptBtn.disabled=true;
+            feedback.textContent='Marcando solución...';
+            try {
+              await dbApi.updateDoc(questionRef, {
+                status:'resuelta',
+                solutionAnswerId:doc.id
+              });
+              feedback.textContent='¡Solución guardada!';
+            } catch(error) {
+              console.error('Marcar solución',error);
+              feedback.textContent='No se pudo marcar. Comprueba que has publicado las nuevas reglas de Firebase.';
+              acceptBtn.disabled=false;
+            }
+          });
+          article.append(acceptBtn);
+        }
+        const reportBtn=reportButton('answer',doc.id,data.uid);
+        if (reportBtn) article.append(reportBtn);
         answers.append(article);
       });
+    };
+
+    // Mantener en sincronía tanto los mensajes como el estado «resuelta».
+    stopQuestion=dbApi.onSnapshot(questionRef, snap=>{
+      if (stopped||currentQuestionId!==id) return;
+      if (!snap.exists()) {
+        feedback.textContent='Esta pregunta ya no está disponible.';
+        return;
+      }
+      currentQuestion={...snap.data()};
+      renderAnswers();
+    },error=>{
+      console.error('Estado de pregunta',error);
+      feedback.textContent='No se pudo consultar el estado de esta pregunta.';
+    });
+    stopDetail=dbApi.onSnapshot(q,snapshot=>{
+      if(stopped||currentQuestionId!==id) return;
+      loadedAnswers=snapshot;
+      renderAnswers();
     },error=>{
       console.error('Respuestas',error);
       answers.replaceChildren(create('p','tech-empty','No se pudieron cargar las respuestas.'));
     });
+
     form.addEventListener('submit',async e=>{
       e.preventDefault();
       const text=input.value.trim();
@@ -232,7 +306,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
       if(Date.now()-lastPublish<15000){feedback.textContent='Espera unos segundos antes de enviar otro mensaje.';return;}
       btn.disabled=true;feedback.textContent='Enviando...';
       try {
-        await dbApi.addDoc(ref,{uid:user.uid,nickname:short(nickname(),24)||'Invitado',text,createdAt:dbApi.serverTimestamp()});
+        await dbApi.addDoc(answersRef,{uid:user.uid,nickname:short(nickname(),24)||'Invitado',text,createdAt:dbApi.serverTimestamp()});
         lastPublish=Date.now();input.value='';feedback.textContent='Respuesta publicada.';
       } catch(err){console.error('Respuesta',err);feedback.textContent='No se pudo publicar. Revisa las reglas.';}
       finally {btn.disabled=false;}
