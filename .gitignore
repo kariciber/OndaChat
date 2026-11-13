@@ -1,0 +1,15 @@
+# No subir nunca la clave de firma Android ni datos privados
+*.keystore
+*.jks
+*.p12
+*.pfx
+signing-key-info.txt
+keystore.properties
+key.properties
+local.properties
+*.apk
+*.aab
+*.apks
+**/.gradle/
+**/build/
+android-sdk/
