@@ -10,6 +10,10 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/moderators/$(request.auth.uid))
         && get(/databases/$(database)/documents/moderators/$(request.auth.uid)).data.active == true;
     }
+    function validAvatar(data) {
+      return !('avatar' in data)
+        || data.avatar in ['🎧','🎤','🎸','💻','🌙','🎨','✨','🎮'];
+    }
     function musicRoom(roomId) {
       return roomId in ['general', 'pop', 'rock', 'electronica', 'chill'];
     }
@@ -24,13 +28,30 @@ service cloud.firestore {
       allow list, create, update, delete: if false;
     }
 
+    // Datos del perfil privados: solo su propietario Google puede consultarlos
+    // y modificarlos. No se guardan email, teléfono ni foto personal.
+    match /profiles/{profileUid} {
+      allow get: if isGoogleUser() && request.auth.uid == profileUid;
+      allow list: if false;
+      allow create, update: if isGoogleUser()
+        && request.auth.uid == profileUid
+        && request.resource.data.keys().hasOnly(['nickname','avatar','updatedAt'])
+        && request.resource.data.keys().hasAll(['nickname','avatar','updatedAt'])
+        && request.resource.data.nickname is string
+        && request.resource.data.nickname.size() > 0
+        && request.resource.data.nickname.size() <= 24
+        && request.resource.data.avatar in ['🎧','🎤','🎸','💻','🌙','🎨','✨','🎮']
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isGoogleUser() && request.auth.uid == profileUid;
+    }
+
     // Las cinco salas musicales actuales siguen accesibles con sesión anónima.
     // La sala de informática requiere iniciar sesión con Google.
     match /rooms/{roomId}/messages/{messageId} {
       allow read: if request.auth != null && (musicRoom(roomId) || techRoom(roomId));
       allow create: if request.auth != null
         && (musicRoom(roomId) || techRoom(roomId))
-        && request.resource.data.keys().hasOnly(['uid', 'nickname', 'text', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['uid', 'nickname', 'text', 'createdAt', 'avatar'])
         && request.resource.data.keys().hasAll(['uid', 'nickname', 'text', 'createdAt'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.nickname is string
@@ -39,7 +60,8 @@ service cloud.firestore {
         && request.resource.data.text is string
         && request.resource.data.text.size() > 0
         && request.resource.data.text.size() <= 300
-        && request.resource.data.createdAt == request.time;
+        && request.resource.data.createdAt == request.time
+        && validAvatar(request.resource.data);
       allow update: if false;
       allow delete: if isModerator();
     }
@@ -48,7 +70,7 @@ service cloud.firestore {
     match /techQuestions/{questionId} {
       allow read: if isGoogleUser();
       allow create: if isGoogleUser()
-        && request.resource.data.keys().hasOnly(['uid','nickname','category','title','details','status','createdAt'])
+        && request.resource.data.keys().hasOnly(['uid','nickname','avatar','category','title','details','status','createdAt'])
         && request.resource.data.keys().hasAll(['uid','nickname','category','title','details','status','createdAt'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.nickname is string
@@ -62,7 +84,8 @@ service cloud.firestore {
         && request.resource.data.details.size() >= 20
         && request.resource.data.details.size() <= 1200
         && request.resource.data.status == 'abierta'
-        && request.resource.data.createdAt == request.time;
+        && request.resource.data.createdAt == request.time
+        && validAvatar(request.resource.data);
 
       // Solo quien hizo la pregunta puede elegir una respuesta como solución.
       // Se conservan los campos originales, permitiendo cambiar únicamente
@@ -73,7 +96,7 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys()
              .hasOnly(['status','solutionAnswerId'])
         && request.resource.data.keys().hasOnly(
-             ['uid','nickname','category','title','details','status','createdAt','solutionAnswerId'])
+             ['uid','nickname','avatar','category','title','details','status','createdAt','solutionAnswerId'])
         && request.resource.data.status == 'resuelta'
         && request.resource.data.solutionAnswerId is string
         && request.resource.data.solutionAnswerId.size() > 0
@@ -85,7 +108,7 @@ service cloud.firestore {
         allow read: if isGoogleUser();
         allow create: if isGoogleUser()
           && exists(/databases/$(database)/documents/techQuestions/$(questionId))
-          && request.resource.data.keys().hasOnly(['uid','nickname','text','createdAt'])
+          && request.resource.data.keys().hasOnly(['uid','nickname','avatar','text','createdAt'])
           && request.resource.data.keys().hasAll(['uid','nickname','text','createdAt'])
           && request.resource.data.uid == request.auth.uid
           && request.resource.data.nickname is string
@@ -94,7 +117,8 @@ service cloud.firestore {
           && request.resource.data.text is string
           && request.resource.data.text.size() >= 10
           && request.resource.data.text.size() <= 800
-          && request.resource.data.createdAt == request.time;
+          && request.resource.data.createdAt == request.time
+          && validAvatar(request.resource.data);
         allow update: if false;
         allow delete: if isModerator();
       }
