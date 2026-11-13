@@ -56,3 +56,51 @@
  #volume{width:67px}
  footer{padding:18px 0 24px}
 }
+
+/* OndaChat 0.2: salas y mejoras de uso desde móviles */
+.rooms{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:1px 25px 16px;scrollbar-width:thin}
+.room-tab{flex:0 0 auto;white-space:nowrap;padding:10px 13px;min-height:42px;border:1px solid #5a416f;border-radius:999px;color:#e3cdef;background:#241735;scroll-snap-align:start;font-size:13px;font-weight:650;transition:background .15s,box-shadow .15s}
+.room-tab:hover,.room-tab:focus-visible{border-color:#d394ef;background:#473060}
+.room-tab.active{color:#fff;background:linear-gradient(100deg,#b24bb6,#834be0);border-color:transparent;box-shadow:0 2px 12px #a44ed044}
+.room-tab:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid #ff9edf;outline-offset:3px}
+.grid>*{min-width:0}
+@media(max-width:800px){
+ .grid{grid-template-columns:minmax(0,1fr);gap:16px}
+ .intro{margin-bottom:22px}
+ .chat{min-height:460px}
+ .rooms{padding-left:20px;padding-right:20px}
+}
+@media(max-width:480px){
+ html{scroll-padding-top:12px}
+ .shell{padding-left:12px;padding-right:12px}
+ .topbar{gap:8px}
+ .brand{font-size:22px}
+ .status span{font-size:11px;padding:7px}
+ .intro .eyebrow{letter-spacing:1.5px}
+ .intro h1{font-size:clamp(31px,9vw,40px);margin:12px 0}
+ .intro p{font-size:14px;line-height:1.5}
+ .panel{border-radius:19px}
+ .radio{padding:18px}
+ .artwork{height:166px}
+ .vinyl{width:145px;height:145px}
+ .vinyl span{width:62px;height:62px;font-size:34px}
+ .radio h2{font-size:20px}
+ .player{gap:9px}
+ .round{width:48px;height:48px}
+ #volume{width:70px}
+ .chat-title{padding:18px 18px 12px}
+ .chat-title h2{font-size:21px}
+ .rooms{padding:1px 16px 14px;gap:7px}
+ .room-tab{min-height:44px;padding:10px 12px}
+ .identity{display:grid;grid-template-columns:auto minmax(0,1fr) 42px;gap:6px}
+ .identity input,.composer input{font-size:16px;min-width:0}
+ .messages{min-height:210px;max-height:48vh}
+ .composer{gap:7px}
+ .composer button{width:48px;min-height:48px}
+ .chat-footer{padding-bottom:14px}
+ .input-row{flex-wrap:wrap}
+ .input-row button{min-height:42px}
+ iframe{max-width:100%}
+ footer{padding-bottom:25px}
+}
+@media(prefers-reduced-motion:reduce){.radio.playing .vinyl{animation:none}.room-tab{transition:none}}
