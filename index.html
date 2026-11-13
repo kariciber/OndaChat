@@ -73,6 +73,27 @@
           <button type="button" id="google-signout" class="logout-button" hidden>Cerrar sesión</button>
         </div>
         <p id="auth-feedback" class="auth-feedback" role="alert" hidden></p>
+        <details class="profile-settings" id="profile-settings" hidden>
+          <summary>🎨 Mi perfil <span class="profile-summary" id="profile-summary">Personalizar avatar y apodo</span></summary>
+          <form id="profile-form" class="profile-form">
+            <p class="profile-tip">Tu apodo y avatar aparecerán en los próximos mensajes. No compartimos tu correo ni tu foto de Google.</p>
+            <label for="profile-name">Tu apodo público</label>
+            <input id="profile-name" type="text" maxlength="24" minlength="1" required autocomplete="nickname" placeholder="Tu apodo">
+            <span class="profile-label">Elige tu avatar</span>
+            <div class="profile-avatars" role="group" aria-label="Elige un avatar">
+              <button type="button" class="profile-avatar selected" data-avatar="🎧" aria-pressed="true" aria-label="Auriculares">🎧</button>
+              <button type="button" class="profile-avatar" data-avatar="🎤" aria-pressed="false" aria-label="Micrófono">🎤</button>
+              <button type="button" class="profile-avatar" data-avatar="🎸" aria-pressed="false" aria-label="Guitarra">🎸</button>
+              <button type="button" class="profile-avatar" data-avatar="💻" aria-pressed="false" aria-label="Ordenador">💻</button>
+              <button type="button" class="profile-avatar" data-avatar="🌙" aria-pressed="false" aria-label="Luna">🌙</button>
+              <button type="button" class="profile-avatar" data-avatar="🎨" aria-pressed="false" aria-label="Arte">🎨</button>
+              <button type="button" class="profile-avatar" data-avatar="✨" aria-pressed="false" aria-label="Estrellas">✨</button>
+              <button type="button" class="profile-avatar" data-avatar="🎮" aria-pressed="false" aria-label="Videojuegos">🎮</button>
+            </div>
+            <div class="profile-actions"><button id="save-profile" type="submit">Guardar mi perfil</button><span class="profile-preview" id="profile-preview" aria-live="polite">🎧 Invitado</span></div>
+            <p id="profile-feedback" class="profile-feedback" role="status" aria-live="polite"></p>
+          </form>
+        </details>
         <div class="identity"><label for="nickname">Tu apodo</label><input type="text" id="nickname" maxlength="24" placeholder="Tu nombre" autocomplete="nickname"><button id="save-nickname" type="button" aria-label="Guardar apodo">✓</button></div>
         <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Mensajes del chat"></div>
         <form id="chat-form" class="composer"><label for="message-input" class="sr-only">Tu mensaje</label><input id="message-input" type="text" maxlength="300" placeholder="Escribe un mensaje..." required><button id="send-btn" aria-label="Enviar mensaje" type="submit">➤</button></form>
