@@ -28,12 +28,19 @@ const clock = timestamp => {
 const catLabel = id => CATEGORIES.find(x => x[0] === id)?.[1] || '💡 Otras dudas';
 const authIsGoogle = user => !!user?.providerData?.some(provider => provider.providerId === 'google.com');
 
-export function mountTechSupport({container, firebaseContext, nickname}) {
+export function mountTechSupport({container, firebaseContext, nickname, avatar}) {
   let stopped = false, stopList = null, stopDetail = null, stopQuestion = null, modCleanup = null, view = 'questions';
   let questionItems = [], lastPublish = 0, currentQuestionId = null;
   const ctx = firebaseContext;
   const user = ctx?.auth?.currentUser;
   const ready = Boolean(ctx && authIsGoogle(user));
+  const avatarIcons = ['🎧','🎤','🎸','💻','🌙','🎨','✨','🎮'];
+  const avatarField = () => {
+    const value = typeof avatar === 'function' ? avatar() : null;
+    return avatarIcons.includes(value) ? { avatar: value } : {};
+  };
+  const displayAuthor = data => (avatarIcons.includes(data.avatar) ? data.avatar+' ' : '')+short(data.nickname,24);
+  const displayBy = data => 'Por '+displayAuthor(data);
   const root = create('section','tech-center');
   const header = create('div','tech-head');
   header.append(create('span','tech-symbol','💻'), create('div','tech-head-copy'));
@@ -151,7 +158,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
         h.type='button';h.addEventListener('click',()=>showThread(q.id, q));
         item.append(meta,h,create('p','tech-excerpt',short(q.details,170)));
         const foot=create('div','tech-question-foot');
-        foot.append(create('span','', 'Por '+short(q.nickname,24)));
+        foot.append(create('span','',displayBy(q)));
         const reportBtn=reportButton('question',q.id,q.uid);
         if(reportBtn)foot.append(reportBtn);
         item.append(foot);
@@ -169,7 +176,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
       try {
         const {dbApi,db}=ctx;
         await dbApi.addDoc(dbApi.collection(db,'techQuestions'),{
-          uid:user.uid,nickname:short(nickname(),24)||'Invitado',category:category.value,
+          uid:user.uid,nickname:short(nickname(),24)||'Invitado',...avatarField(),category:category.value,
           title,details:desc,status:'abierta',createdAt:dbApi.serverTimestamp()
         });
         lastPublish=Date.now();
@@ -211,7 +218,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
     card.append(create('span','tech-category',catLabel(question.category)),
       create('h4','tech-thread-title',short(question.title,120)),
       create('p','tech-full-description',short(question.details,1200)),
-      create('p','tech-question-by','Por '+short(question.nickname,24)+' · '+clock(question.createdAt)),
+      create('p','tech-question-by',displayBy(question)+' · '+clock(question.createdAt)),
       solvedBanner);
     content.append(card,create('h4','tech-section-title','Respuestas de la comunidad'));
 
@@ -252,7 +259,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
           article.append(create('div','tech-solved-banner','✅ Solución aceptada'));
         }
         const head=create('div','tech-question-foot');
-        head.append(create('strong','',short(data.nickname,24)),create('span','',clock(data.createdAt)));
+        head.append(create('strong','',displayAuthor(data)),create('span','',clock(data.createdAt)));
         article.append(head,create('p','',short(data.text,800)));
 
         // Solo el autor de la pregunta puede elegir una solución.
@@ -311,7 +318,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
       if(Date.now()-lastPublish<15000){feedback.textContent='Espera unos segundos antes de enviar otro mensaje.';return;}
       btn.disabled=true;feedback.textContent='Enviando...';
       try {
-        await dbApi.addDoc(answersRef,{uid:user.uid,nickname:short(nickname(),24)||'Invitado',text,createdAt:dbApi.serverTimestamp()});
+        await dbApi.addDoc(answersRef,{uid:user.uid,nickname:short(nickname(),24)||'Invitado',...avatarField(),text,createdAt:dbApi.serverTimestamp()});
         lastPublish=Date.now();input.value='';feedback.textContent='Respuesta publicada.';
       } catch(err){console.error('Respuesta',err);feedback.textContent='No se pudo publicar. Revisa las reglas.';}
       finally {btn.disabled=false;}
@@ -341,7 +348,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
         const data=doc.data();
         const card=create('article','tech-chat-message');
         const head=create('div','tech-question-foot');
-        head.append(create('strong','',short(data.nickname,24)),create('span','',clock(data.createdAt)));
+        head.append(create('strong','',displayAuthor(data)),create('span','',clock(data.createdAt)));
         card.append(head,create('p','',short(data.text,300)));
         const b=reportButton('chat',doc.id,data.uid,'informatica');
         if(b)card.append(b);
@@ -359,7 +366,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
       if(Date.now()-lastPublish<5000){feedback.textContent='Espera 5 segundos entre mensajes.';return;}
       send.disabled=true;feedback.textContent='Enviando...';
       try{
-        await dbApi.addDoc(room,{uid:user.uid,nickname:short(nickname(),24)||'Invitado',text,createdAt:dbApi.serverTimestamp()});
+        await dbApi.addDoc(room,{uid:user.uid,nickname:short(nickname(),24)||'Invitado',...avatarField(),text,createdAt:dbApi.serverTimestamp()});
         lastPublish=Date.now();input.value='';feedback.textContent='';
       }catch(err){console.error('Chat IT',err);feedback.textContent='No se pudo enviar. Comprueba las reglas nuevas.';}
       finally{send.disabled=false;}
