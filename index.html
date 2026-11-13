@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100a22">
+  <meta name="description" content="OndaChat: música, radio y conversaciones en un solo lugar.">
+  <title>OndaChat · Música y comunidad</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+<div class="shell">
+  <header class="topbar">
+    <a href="#inicio" class="brand"><span class="brand-icon">♫</span> Onda<span>Chat</span></a>
+    <div class="status"><span class="live">● Espacio musical</span><span id="mode-badge">Demo local</span></div>
+  </header>
+  <main id="inicio">
+    <section class="intro">
+      <div class="eyebrow">UN LUGAR PARA ESCUCHAR Y CONECTAR</div>
+      <h1>Tu música.<br><em>Tu gente.</em> Tu onda.</h1>
+      <p>Escucha una emisora y comparte el momento en nuestra sala de chat. Un espacio con ritmo propio.</p>
+    </section>
+    <div class="grid">
+      <section class="panel radio" aria-labelledby="radio-title">
+        <div class="eyebrow">RADIO EN DIRECTO <span class="signal">▂▄▆█</span></div>
+        <div class="artwork" aria-hidden="true"><div class="vinyl"><span>♫</span></div></div>
+        <h2 id="radio-title">La Onda de Alternativas</h2>
+        <p class="muted">Configura una emisión que tengas permiso para reproducir.</p>
+        <div class="player">
+          <button id="play-btn" class="round" aria-label="Reproducir radio" type="button">▶</button>
+          <div class="player-info"><strong id="player-title">Radio en pausa</strong><small id="player-state">Lista para conectar</small></div>
+          <label for="volume" class="sr-only">Volumen</label>
+          <input id="volume" aria-label="Volumen" type="range" min="0" max="100" value="45">
+        </div>
+        <details class="settings">
+          <summary>Configurar emisión</summary>
+          <label for="stream-url">URL directa del audio (HTTPS)</label>
+          <div class="input-row"><input id="stream-url" type="url" autocomplete="off" placeholder="https://radio.example/stream"><button id="save-stream" type="button">Guardar</button></div>
+          <small>Necesitas la dirección directa de un flujo compatible, no la página de la emisora.</small>
+        </details>
+        <audio id="radio-audio" preload="none"></audio>
+      </section>
+      <section class="panel chat" aria-labelledby="chat-title">
+        <div class="chat-title"><div><span class="eyebrow">COMUNIDAD</span><h2 id="chat-title">Sala general 💬</h2></div><span class="pill">En construcción</span></div>
+        <p class="notice" id="status-msg" role="status">Modo demo: tus mensajes solo se guardan en este navegador. Aún no hay chat público.</p>
+        <div class="identity"><label for="nickname">Tu apodo</label><input type="text" id="nickname" maxlength="24" placeholder="Tu nombre" autocomplete="nickname"><button id="save-nickname" type="button" aria-label="Guardar apodo">✓</button></div>
+        <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Mensajes del chat"></div>
+        <form id="chat-form" class="composer"><label for="message-input" class="sr-only">Tu mensaje</label><input id="message-input" type="text" maxlength="300" placeholder="Escribe un mensaje..." required><button id="send-btn" aria-label="Enviar mensaje" type="submit">➤</button></form>
+        <div class="chat-footer"><span>Respeto · Sin spam</span><span id="counter">0/300</span></div>
+      </section>
+    </div>
+  </main>
+  <footer>OndaChat · Primera versión de pruebas <span>Hecho con ♡ y buena música</span></footer>
+</div>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
