@@ -2,9 +2,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /rooms/{roomId}/messages/{messageId} {
-      allow read: if request.auth != null && roomId == 'general';
+      allow read: if request.auth != null && roomId in ['general', 'pop', 'rock', 'electronica', 'chill'];
       allow create: if request.auth != null
-        && roomId == 'general'
+        && roomId in ['general', 'pop', 'rock', 'electronica', 'chill']
         && request.resource.data.keys().hasOnly(['uid', 'nickname', 'text', 'createdAt'])
         && request.resource.data.keys().hasAll(['uid', 'nickname', 'text', 'createdAt'])
         && request.resource.data.uid == request.auth.uid
