@@ -178,7 +178,7 @@ function subscribeRoom(roomId) {
     unsubscribeRoom = null;
   }
   const generation = ++roomGeneration;
-  const { dbApi, db, uid } = firebaseContext;
+  const { dbApi, db, auth } = firebaseContext;
   const roomRef = dbApi.collection(db, 'rooms', roomId, 'messages');
   const recent = dbApi.query(roomRef, dbApi.orderBy('createdAt', 'desc'), dbApi.limit(MAX_MESSAGES));
 
@@ -200,9 +200,12 @@ function subscribeRoom(roomId) {
       };
     });
     draw(items.reverse());
-    sendRemote = data => dbApi.addDoc(roomRef, {
-      ...data, uid, createdAt: dbApi.serverTimestamp()
-    });
+    sendRemote = data => {
+      if (!auth.currentUser) throw new Error('La sesión no está disponible');
+      return dbApi.addDoc(roomRef, {
+        ...data, uid: auth.currentUser.uid, createdAt: dbApi.serverTimestamp()
+      });
+    };
     mode = 'online';
     el('send-btn').disabled = false;
     el('mode-badge').textContent = 'Chat conectado';
@@ -221,7 +224,10 @@ function subscribeRoom(roomId) {
 }
 
 async function startRealtimeChat() {
-  if (!firebaseConfig.apiKey || !firebaseConfig.projectId || !firebaseConfig.appId) return;
+  if (!firebaseConfig.apiKey || !firebaseConfig.projectId || !firebaseConfig.appId) {
+    el('auth-state').textContent = 'Modo de demostración';
+    return;
+  }
   try {
     const [core, authApi, dbApi] = await Promise.all([
       import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js'),
@@ -230,9 +236,69 @@ async function startRealtimeChat() {
     ]);
     const app = core.initializeApp(firebaseConfig);
     const auth = authApi.getAuth(app);
-    const login = await authApi.signInAnonymously(auth);
-    firebaseContext = { dbApi, db: dbApi.getFirestore(app), uid: login.user.uid };
-    subscribeRoom(activeRoom);
+    const googleBtn = el('google-signin');
+    const logoutBtn = el('google-signout');
+    await auth.authStateReady();
+    if (!auth.currentUser) await authApi.signInAnonymously(auth);
+    firebaseContext = { dbApi, db: dbApi.getFirestore(app), auth };
+
+    function updateAccount(user) {
+      const isGoogle = Boolean(user?.providerData?.some(p => p.providerId === 'google.com'));
+      el('auth-state').textContent = isGoogle
+        ? 'Google: ' + (user.displayName || 'Cuenta conectada')
+        : user ? 'Participas como invitado' : 'Iniciando sesión...';
+      googleBtn.hidden = isGoogle;
+      logoutBtn.hidden = !isGoogle;
+    }
+    authApi.onAuthStateChanged(auth, user => {
+      updateAccount(user);
+      if (!user) {
+        if (unsubscribeRoom) {
+          unsubscribeRoom();
+          unsubscribeRoom = null;
+        }
+        ++roomGeneration;
+        mode = 'unavailable';
+        sendRemote = null;
+        el('send-btn').disabled = true;
+        el('mode-badge').textContent = 'Conectando...';
+        notice('Preparando tu sesión...');
+      } else {
+        subscribeRoom(activeRoom);
+      }
+    });
+    googleBtn.disabled = false;
+    googleBtn.addEventListener('click', async () => {
+      googleBtn.disabled = true;
+      try {
+        const provider = new authApi.GoogleAuthProvider();
+        await authApi.signInWithPopup(auth, provider);
+      } catch (error) {
+        console.error('Google login', error);
+        const hints = {
+          'auth/operation-not-allowed': 'Activa Google en Firebase > Authentication > Método de acceso.',
+          'auth/unauthorized-domain': 'Autoriza kariciber.github.io en Authentication > Configuración.',
+          'auth/popup-blocked': 'El navegador bloqueó la ventana. Prueba en Chrome o permite ventanas emergentes.',
+          'auth/popup-closed-by-user': 'Has cerrado la ventana de acceso a Google.',
+          'auth/account-exists-with-different-credential': 'Esta cuenta ya usa otro método de acceso.'
+        };
+        notice(hints[error.code] || 'No se pudo iniciar sesión con Google. Prueba de nuevo.', mode === 'online');
+      } finally {
+        googleBtn.disabled = false;
+      }
+    });
+    logoutBtn.addEventListener('click', async () => {
+      logoutBtn.disabled = true;
+      try {
+        await authApi.signOut(auth);
+        await authApi.signInAnonymously(auth);
+      } catch (error) {
+        console.error('Google logout', error);
+        notice('No se pudo cerrar sesión. Recarga la página.');
+      } finally {
+        logoutBtn.disabled = false;
+      }
+    });
   } catch (error) {
     console.error('Firebase', error);
     firebaseContext = null;
@@ -240,6 +306,7 @@ async function startRealtimeChat() {
     mode = activeRoom === 'general' ? 'demo' : 'unavailable';
     el('send-btn').disabled = activeRoom !== 'general';
     el('mode-badge').textContent = 'Demo local';
+    el('auth-state').textContent = 'Acceso no disponible';
     notice('Firebase no está disponible. Solo la sala General permite una demostración local.');
   }
 }
