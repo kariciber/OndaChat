@@ -1,8 +1,8 @@
 /* OndaChat: solo caché de recursos públicos. No almacenar mensajes ni identidad. */
-const CACHE_NAME = 'ondachat-static-v5';
+const CACHE_NAME = 'ondachat-static-v6';
 const SHELL = [
-  './', './index.html', './styles.css?v=5', './app.js', './firebase-config.js',
-  './tech-support.js', './moderation.js', './mobile-nav.js?v=5', './install.js', './manifest.webmanifest',
+  './', './index.html', './styles.css?v=6', './app.js', './firebase-config.js',
+  './tech-support.js', './moderation.js', './mobile-nav.js?v=6', './install.js', './manifest.webmanifest',
   './icon-192.png', './icon-512.png'
 ];
 const PATHS = new Set(SHELL.map(path => new URL(path, self.registration.scope).pathname));
