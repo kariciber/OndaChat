@@ -69,6 +69,7 @@
           <button type="button" id="google-signin" class="google-button" disabled><span class="google-mark" aria-hidden="true">G</span> Entrar con Google</button>
           <button type="button" id="google-signout" class="logout-button" hidden>Cerrar sesión</button>
         </div>
+        <p id="auth-feedback" class="auth-feedback" role="alert" hidden></p>
         <div class="identity"><label for="nickname">Tu apodo</label><input type="text" id="nickname" maxlength="24" placeholder="Tu nombre" autocomplete="nickname"><button id="save-nickname" type="button" aria-label="Guardar apodo">✓</button></div>
         <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Mensajes del chat"></div>
         <form id="chat-form" class="composer"><label for="message-input" class="sr-only">Tu mensaje</label><input id="message-input" type="text" maxlength="300" placeholder="Escribe un mensaje..." required><button id="send-btn" aria-label="Enviar mensaje" type="submit">➤</button></form>
