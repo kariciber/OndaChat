@@ -38,3 +38,6 @@ En «Configurar emisión», introducir una URL HTTPS **directa** de audio reprod
 - Moderación y perfiles, presencia de usuarios conectados y personalización de emisoras.
 
 **Seguridad:** Las claves privadas de servicio, tokens de Meta y contraseñas nunca deben añadirse al repositorio público.
+
+## Sala en desarrollo
+- **💻 Técnicos de informática**: vista previa para Windows, Linux, redes, reparaciones, seguridad y programación. No permite publicar mensajes y no tiene permisos de Firestore. No hace falta modificar reglas hasta activarla formalmente.
