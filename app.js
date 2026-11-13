@@ -264,6 +264,12 @@ function setRoom(roomId) {
     button.classList.toggle('active', selected);
     button.setAttribute('aria-pressed', String(selected));
   });
+  const roomsNav = el('rooms');
+  const selectedRoom = roomsNav.querySelector('.room-tab.active');
+  if(selectedRoom && roomsNav.scrollWidth>roomsNav.clientWidth) {
+    const target = selectedRoom.offsetLeft - roomsNav.offsetLeft - (roomsNav.clientWidth-selectedRoom.offsetWidth)/2;
+    roomsNav.scrollTo({left:Math.max(0,target),behavior:'smooth'});
+  }
   if (ROOMS[roomId].preview) {
     showPreviewRoom();
     return;
@@ -281,6 +287,15 @@ function setRoom(roomId) {
 document.querySelectorAll('.room-tab').forEach(button => {
   button.addEventListener('click', () => setRoom(button.dataset.room));
 });
+// El carrusel de salas también se puede desplazar con flechas táctiles.
+for(const [id,direction] of [['rooms-prev',-1],['rooms-next',1]]) {
+  const arrow=el(id);
+  if(!arrow)continue;
+  arrow.addEventListener('click',()=>{
+    const rooms=el('rooms');
+    rooms.scrollBy({left:direction*Math.max(160,rooms.clientWidth*.7),behavior:'smooth'});
+  });
+}
 
 el('chat-form').addEventListener('submit', async event => {
   event.preventDefault();
