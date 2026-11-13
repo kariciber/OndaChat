@@ -9,11 +9,11 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <meta name="description" content="OndaChat: música, radio y conversaciones en un solo lugar.">
   <title>OndaChat · Música y comunidad</title>
-  <link rel="stylesheet" href="./styles.css?v=5">
+  <link rel="stylesheet" href="./styles.css?v=6">
   <!-- Estilo básico incrustado para evitar una barra sin formato si Android conserva CSS antiguo. -->
   <style>
     .mobile-bottom-nav{display:none}
-    @media(max-width:800px){
+    @media(max-width:1100px), (display-mode:standalone) and (max-width:1400px){
       body{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
       .mobile-bottom-nav{
         display:grid;position:fixed;left:0;right:0;bottom:0;z-index:100;
@@ -141,7 +141,7 @@
     <span class="mobile-nav-icon" aria-hidden="true">👤</span><span>Mi perfil</span>
   </button>
 </nav>
-<script src="./mobile-nav.js?v=5" defer></script>
+<script src="./mobile-nav.js?v=6" defer></script>
 <script type="module" src="./app.js"></script>
 <script src="./install.js" defer></script>
 </body>
