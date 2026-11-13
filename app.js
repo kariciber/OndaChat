@@ -1,4 +1,5 @@
 import { firebaseConfig } from './firebase-config.js';
+import { mountTechSupport } from './tech-support.js';
 
 const el = id => document.getElementById(id);
 const STORE = { name: 'ondachat:nickname', messages: 'ondachat:demo', stream: 'ondachat:stream' };
@@ -13,6 +14,7 @@ const ROOMS = Object.freeze({
   informatica: { title: 'Sala de Técnicos de Informática 💻', label: 'Técnicos de informática', preview: true }
 });
 let activeRoom = 'general', firebaseContext = null, unsubscribeRoom = null, roomGeneration = 0;
+let techCleanup = null;
 const clean = (value, limit = 300) => String(value ?? '').trim().slice(0, limit);
 const name = () => clean(el('nickname').value, 24) || 'Invitado';
 const save = (key, value) => { try { localStorage.setItem(key, value); } catch (e) { console.warn('No se pudo guardar localmente', e); } };
@@ -73,35 +75,20 @@ function showPreviewRoom() {
     unsubscribeRoom = null;
   }
   ++roomGeneration;
+  if (techCleanup) {techCleanup(); techCleanup = null;}
   mode = 'preview';
   sendRemote = null;
   el('send-btn').disabled = true;
   el('chat-form').hidden = true;
+  document.querySelector('.chat').classList.add('tech-active');
+  el('chat-footer').hidden = true;
   el('mode-badge').textContent = 'Sala en desarrollo';
-  notice('Esta sala está en desarrollo. Aún no se pueden enviar mensajes.');
-
-  const container = el('messages');
-  container.replaceChildren();
-  const card = document.createElement('div');
-  card.className = 'dev-room';
-  const symbol = document.createElement('span');
-  symbol.className = 'dev-room-icon';
-  symbol.textContent = '💻';
-  const tag = document.createElement('span');
-  tag.className = 'dev-room-tag';
-  tag.textContent = 'PRÓXIMAMENTE';
-  const title = document.createElement('h3');
-  title.textContent = 'Técnicos de informática';
-  const description = document.createElement('p');
-  description.textContent = 'Un espacio para hablar de ordenadores, solucionar problemas y compartir conocimientos técnicos.';
-  const topics = document.createElement('p');
-  topics.className = 'dev-room-topics';
-  topics.textContent = '🖥️ Windows y Linux   ·   🌐 Redes   ·   🔧 Reparaciones   ·   🛡️ Seguridad   ·   💡 Programación';
-  const finalNote = document.createElement('p');
-  finalNote.className = 'dev-room-note';
-  finalNote.textContent = 'Estamos preparando esta sala. Las demás siguen disponibles para conversar.';
-  card.append(symbol,tag,title,description,topics,finalNote);
-  container.append(card);
+  notice('Centro de informática en pruebas. Para participar, inicia sesión con Google.');
+  techCleanup = mountTechSupport({
+    container: el('messages'),
+    firebaseContext,
+    nickname: name
+  });
 }
 
 function setRoom(roomId) {
@@ -117,6 +104,9 @@ function setRoom(roomId) {
     showPreviewRoom();
     return;
   }
+  if (techCleanup) {techCleanup(); techCleanup = null;}
+  document.querySelector('.chat').classList.remove('tech-active');
+  el('chat-footer').hidden = false;
   el('chat-form').hidden = false;
   if (firebaseContext) {
     subscribeRoom(roomId);
