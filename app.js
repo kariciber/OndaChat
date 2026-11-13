@@ -15,6 +15,100 @@ const ROOMS = Object.freeze({
 });
 let activeRoom = 'general', firebaseContext = null, unsubscribeRoom = null, roomGeneration = 0;
 let techCleanup = null;
+const AVATARS = Object.freeze(['🎧','🎤','🎸','💻','🌙','🎨','✨','🎮']);
+let currentAvatar = '🎧', profileLoadVersion = 0;
+const profileButtons = [...document.querySelectorAll('.profile-avatar')];
+function chooseAvatar(icon) {
+  currentAvatar = AVATARS.includes(icon) ? icon : '🎧';
+  profileButtons.forEach(button => {
+    const selected = button.dataset.avatar === currentAvatar;
+    button.classList.toggle('selected',selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
+  updateProfilePreview();
+}
+function updateProfilePreview() {
+  const nickname = document.getElementById('profile-name')?.value.trim() || 'Invitado';
+  el('profile-preview').textContent = currentAvatar + ' ' + nickname.slice(0,24);
+}
+profileButtons.forEach(button=>button.addEventListener('click',()=>chooseAvatar(button.dataset.avatar)));
+el('profile-name').addEventListener('input',updateProfilePreview);
+function profileFeedback(text) {
+  el('profile-feedback').textContent = text;
+}
+function showProfilePanel(user) {
+  const google = Boolean(user?.providerData?.some(p=>p.providerId === 'google.com'));
+  el('profile-settings').hidden = !google;
+  if (!google) {
+    ++profileLoadVersion;
+    chooseAvatar('🎧');
+    profileFeedback('');
+  }
+}
+async function loadProfile(user) {
+  const version = ++profileLoadVersion;
+  el('profile-name').value = name();
+  chooseAvatar('🎧');
+  profileFeedback('Cargando perfil...');
+  if (!firebaseContext || !user) return;
+  try {
+    const {dbApi,db} = firebaseContext;
+    const snapshot = await dbApi.getDoc(dbApi.doc(db,'profiles',user.uid));
+    if (version !== profileLoadVersion || firebaseContext.auth.currentUser?.uid !== user.uid) return;
+    if (snapshot.exists()) {
+      const data = snapshot.data();
+      const nick = clean(data.nickname,24);
+      if (nick) {
+        el('nickname').value = nick;
+        el('profile-name').value = nick;
+        save(STORE.name,nick);
+      }
+      chooseAvatar(data.avatar);
+    }
+    profileFeedback(snapshot.exists() ? 'Perfil cargado. Puedes editarlo cuando quieras.' : 'Personaliza tu apodo y avatar y pulsa Guardar.');
+  } catch(error) {
+    if(version !== profileLoadVersion)return;
+    console.error('Cargar perfil',error);
+    profileFeedback('No se pudo cargar el perfil. Revisa que hayas publicado las nuevas reglas de Firebase.');
+  }
+}
+async function saveProfile(nickname, icon) {
+  if (!signedInGoogle() || !firebaseContext) {
+    profileFeedback('Inicia sesión con Google para guardar tu perfil.');
+    return false;
+  }
+  const nick = clean(nickname,24);
+  if (!nick) {
+    profileFeedback('Elige un apodo antes de guardar.');
+    return false;
+  }
+  const avatar = AVATARS.includes(icon) ? icon : '🎧';
+  const {dbApi,db,auth}=firebaseContext;
+  const uid=auth.currentUser.uid;
+  const button=el('save-profile');
+  button.disabled = true;
+  profileFeedback('Guardando...');
+  try {
+    await dbApi.setDoc(dbApi.doc(db,'profiles',uid),{
+      nickname:nick,avatar,updatedAt:dbApi.serverTimestamp()
+    });
+    if(auth.currentUser?.uid !== uid) return false;
+    el('nickname').value = nick;
+    el('profile-name').value = nick;
+    save(STORE.name,nick);
+    chooseAvatar(avatar);
+    profileFeedback('✅ Perfil guardado. Tu avatar aparecerá en tus próximos mensajes.');
+    return true;
+  } catch(error) {
+    console.error('Guardar perfil',error);
+    profileFeedback('No se pudo guardar. Publica las nuevas reglas de Firestore y vuelve a intentarlo.');
+    return false;
+  } finally { button.disabled=false; }
+}
+el('profile-form').addEventListener('submit',event=>{
+  event.preventDefault();
+  saveProfile(el('profile-name').value,currentAvatar);
+});
 const clean = (value, limit = 300) => String(value ?? '').trim().slice(0, limit);
 const name = () => clean(el('nickname').value, 24) || 'Invitado';
 const save = (key, value) => { try { localStorage.setItem(key, value); } catch (e) { console.warn('No se pudo guardar localmente', e); } };
@@ -73,7 +167,7 @@ function draw(items) {
     row.className = 'message';
     const avatar = document.createElement('span');
     avatar.className = 'avatar';
-    avatar.textContent = (clean(item.nickname, 24).charAt(0) || '?').toUpperCase();
+    avatar.textContent = AVATARS.includes(item.avatar) ? item.avatar : (clean(item.nickname, 24).charAt(0) || '?').toUpperCase();
     const body = document.createElement('div');
     body.className = 'message-body';
     const head = document.createElement('div');
@@ -106,6 +200,11 @@ el('save-nickname').addEventListener('click', () => {
   el('nickname').value = name();
   save(STORE.name, name());
   el('nickname').blur();
+  if (signedInGoogle()) {
+    el('profile-name').value = name();
+    updateProfilePreview();
+    saveProfile(name(),currentAvatar);
+  }
 });
 el('message-input').addEventListener('input', () => {
   el('counter').textContent = el('message-input').value.length + '/' + MAX_LENGTH;
@@ -136,7 +235,8 @@ function showPreviewRoom() {
     techCleanup = mountTechSupport({
       container: el('messages'),
       firebaseContext,
-      nickname: name
+      nickname: name,
+      avatar: () => signedInGoogle() ? currentAvatar : null
     });
   } catch (error) {
     console.error('Sala informática', error);
@@ -201,7 +301,7 @@ el('chat-form').addEventListener('submit', async event => {
   const sendToCurrentRoom = sendRemote;
   el('send-btn').disabled = true;
   try {
-    await sendToCurrentRoom({ nickname, text });
+    await sendToCurrentRoom({ nickname, text, ...(signedInGoogle() ? { avatar: currentAvatar } : {}) });
     lastSent = Date.now();
     el('message-input').value = '';
     el('counter').textContent = '0/' + MAX_LENGTH;
@@ -293,6 +393,7 @@ function subscribeRoom(roomId) {
         roomId,
         uid:data.uid,
         nickname: data.nickname,
+        avatar: data.avatar,
         text: data.text,
         createdAt: data.createdAt?.toDate?.()?.toISOString?.() || new Date().toISOString()
       };
@@ -353,6 +454,10 @@ async function startRealtimeChat() {
     }
     authApi.onAuthStateChanged(auth, user => {
       updateAccount(user);
+      showProfilePanel(user);
+      if (user && signedInGoogle()) {
+        loadProfile(user);
+      }
       if (!user) {
         if (unsubscribeRoom) { unsubscribeRoom(); unsubscribeRoom = null; }
         ++roomGeneration;
