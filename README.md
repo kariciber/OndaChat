@@ -39,5 +39,20 @@ En «Configurar emisión», introducir una URL HTTPS **directa** de audio reprod
 
 **Seguridad:** Las claves privadas de servicio, tokens de Meta y contraseñas nunca deben añadirse al repositorio público.
 
-## Sala en desarrollo
-- **💻 Técnicos de informática**: vista previa para Windows, Linux, redes, reparaciones, seguridad y programación. No permite publicar mensajes y no tiene permisos de Firestore. No hace falta modificar reglas hasta activarla formalmente.
+
+## Sala de técnicos de informática (beta, en desarrollo)
+- Panel violeta de **Preguntas**, **Conversar** y **Normas**.
+- Preguntas categorizadas (Windows, Linux, redes, hardware, seguridad, programación y otras), respuestas en hilos y chat en tiempo real.
+- Botones de denuncia. Los avisos se almacenan en `techReports`; la revisión es **manual** desde Firebase.
+- **Solo para sesiones iniciadas con Google**; el inicio de sesión anónimo no permite leer ni publicar en el centro informático.
+- Todas las salas musicales existentes mantienen su funcionamiento.
+- Este centro **no está listo para promocionarlo públicamente**: falta protección antispam del servidor, moderación activa, políticas de privacidad, procedimiento de retirada de contenido y pruebas de abuso. El límite de tiempo entre publicaciones en navegador no es una protección contra bots.
+
+### Para activar las pruebas del centro informático
+1. En Firebase Authentication → Método de acceso, habilitar Google y configurar el correo de asistencia, si aún no está activado.
+2. Añadir `kariciber.github.io` en Authentication → Configuración → Dominios autorizados, si hace falta.
+3. En Cloud Firestore → Reglas, reemplazar las reglas antiguas por el contenido actual de `firestore.rules` y publicar.
+4. Recargar la web, elegir «💻 Técnicos de informática» e iniciar sesión con Google.
+5. Probar una pregunta, una respuesta y un mensaje, desde ordenador y móvil, sin compartir datos personales.
+
+Hasta publicar esas reglas, los formularios de informática no podrán leer ni escribir datos de Firestore. No es necesario crear colecciones a mano.
