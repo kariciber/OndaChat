@@ -55,14 +55,18 @@
       </section>
       <section class="panel chat" aria-labelledby="chat-title">
         <div class="chat-title"><div><span class="eyebrow">COMUNIDAD</span><h2 id="chat-title">Sala general 💬</h2></div><span class="pill">En construcción</span></div>
-        <nav class="rooms" id="rooms" aria-label="Elige una sala musical">
+        <div class="rooms-nav">
+          <button id="rooms-prev" class="rooms-arrow" type="button" aria-label="Ver salas anteriores">‹</button>
+          <nav class="rooms" id="rooms" aria-label="Elige una sala musical">
           <button type="button" class="room-tab active" data-room="general" aria-pressed="true">💬 General</button>
           <button type="button" class="room-tab" data-room="pop" aria-pressed="false">🎤 Pop</button>
           <button type="button" class="room-tab" data-room="rock" aria-pressed="false">🎸 Rock</button>
           <button type="button" class="room-tab" data-room="electronica" aria-pressed="false">🎛️ Electrónica</button>
           <button type="button" class="room-tab" data-room="chill" aria-pressed="false">🌙 Chill</button>
           <button type="button" class="room-tab preview-room" data-room="informatica" aria-pressed="false">💻 Técnicos de informática <span class="room-tag">En desarrollo</span></button>
-        </nav>
+          </nav>
+          <button id="rooms-next" class="rooms-arrow" type="button" aria-label="Ver más salas">›</button>
+        </div>
         <p class="notice" id="status-msg" role="status">Modo demo: tus mensajes solo se guardan en este navegador. Aún no hay chat público.</p>
         <div class="auth-panel">
           <div class="auth-copy">
