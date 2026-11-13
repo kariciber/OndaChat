@@ -197,3 +197,28 @@
 .tech-solve-button{margin-top:5px;padding:10px 13px;min-height:42px;border:1px solid #b583e4;border-radius:10px;background:#4b2c68;color:#f8ecff;font-size:12px;font-weight:700}
 .tech-solve-button:hover{background:#734197}
 .tech-solve-button:disabled{opacity:.55;cursor:not-allowed}
+
+/* Panel de moderación y denuncia, conservando el diseño violeta */
+.message-report{display:inline-block;margin-top:6px;padding:3px 0;background:none;border:0;color:#bda4ce;font-size:11px;text-decoration:underline}
+.message-report:hover,.message-report:focus-visible{color:#f1c1fb}
+.mod-panel{min-width:0;display:flex;flex-direction:column;gap:12px}
+.mod-title{font-size:19px;margin:0;color:#f6e8ff}
+.mod-intro{font-size:13px;color:#c8b7d5;line-height:1.55;margin:0}
+.mod-filters{display:flex;gap:8px;flex-wrap:wrap}
+.mod-filter{border:1px solid #79529d;background:#251a38;color:#dfcce8;border-radius:11px;padding:10px 12px;min-height:42px;font-size:13px}
+.mod-filter.active{background:linear-gradient(110deg,#a847c1,#7545d4);color:white;border-color:transparent}
+.mod-feed{display:flex;flex-direction:column;gap:10px;min-width:0}
+.mod-empty{background:#281b3a;border:1px dashed #8664a1;color:#d6c4ea;border-radius:12px;padding:18px;font-size:13px;text-align:center}
+.mod-report{padding:15px;border:1px solid #6e5184;border-radius:14px;background:#30213f;overflow-wrap:anywhere}
+.mod-report-title{font-size:15px}
+.mod-report-meta{font-size:12px;color:#ae9bbb;line-height:1.5}
+.mod-actions{display:flex;gap:8px;flex-wrap:wrap}
+.mod-action{padding:9px 11px;min-height:39px;background:#49315b;color:#f2e4ff;border:1px solid #8965a0;border-radius:10px;font-size:12px;font-weight:650}
+.mod-action:hover{background:#65427c}
+.mod-action.mod-danger{background:#6c2a51;border-color:#bd679f;color:#ffe2f5}
+.mod-action.mod-danger:hover{background:#833b64}
+.mod-action:disabled{opacity:.5;cursor:not-allowed}
+.mod-preview{margin-top:10px;color:#e9dcec;font-size:13px;line-height:1.55;white-space:pre-wrap}
+.mod-preview p{overflow-wrap:anywhere;margin:8px 0}
+.mod-preview small{color:#baa4cf}
+@media(max-width:600px){.mod-action{flex:1 1 auto}}
