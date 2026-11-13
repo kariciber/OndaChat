@@ -399,11 +399,18 @@ function subscribeRoom(roomId) {
       };
     });
     draw(items.reverse());
-    sendRemote = data => {
+    sendRemote = async data => {
       if (!auth.currentUser) throw new Error('La sesión no está disponible');
-      return dbApi.addDoc(roomRef, {
-        ...data, uid: auth.currentUser.uid, createdAt: dbApi.serverTimestamp()
-      });
+      const payload = { ...data, uid: auth.currentUser.uid, createdAt: dbApi.serverTimestamp() };
+      try {
+        return await dbApi.addDoc(roomRef, payload);
+      } catch (error) {
+        // Hasta publicar reglas nuevas, los chats antiguos aceptan el
+        // formato sin avatar. No interrumpimos los mensajes existentes.
+        if (error?.code !== 'permission-denied' || !('avatar' in data)) throw error;
+        const { avatar, ...legacy } = payload;
+        return dbApi.addDoc(roomRef, legacy);
+      }
     };
     mode = 'online';
     el('send-btn').disabled = false;
