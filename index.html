@@ -39,6 +39,15 @@
           <div class="input-row"><input id="stream-url" type="url" autocomplete="off" placeholder="https://radio.example/stream"><button id="save-stream" type="button">Guardar</button></div>
           <small>Necesitas la dirección directa de un flujo compatible, no la página de la emisora.</small>
         </details>
+        <details class="settings" id="guest-radio">
+          <summary>🎧 Escuchar emisora invitada: Anti Radio</summary>
+          <p class="muted">Emisora independiente de música electrónica, pop y alternativa. Pulsa reproducir en su reproductor oficial.</p>
+          <iframe src="https://antiradio.net/radio-widget/?layout=bar&amp;theme=dark&amp;accent=ff2e88"
+                  width="100%" height="84" style="border:0;display:block"
+                  title="Anti Radio, reproductor oficial en directo"
+                  loading="lazy"></iframe>
+          <p class="muted"><a href="https://antiradio.net/" target="_blank" rel="noopener noreferrer" style="color:#d9a1ff">Escuchar en la web oficial de Anti Radio</a></p>
+        </details>
         <audio id="radio-audio" preload="none"></audio>
       </section>
       <section class="panel chat" aria-labelledby="chat-title">
