@@ -104,3 +104,17 @@
  footer{padding-bottom:25px}
 }
 @media(prefers-reduced-motion:reduce){.radio.playing .vinyl{animation:none}.room-tab{transition:none}}
+
+/* Sala de técnicos de informática: vista previa, todavía sin chat público */
+.room-tab.preview-room{border-style:dashed;border-color:#b780db8c;background:#2c1e40;color:#eeddf9}
+.room-tab.preview-room .room-tag{display:inline-block;margin-left:7px;padding:3px 7px;border-radius:999px;background:#aa68db28;color:#d9b4f7;font-size:10px;letter-spacing:.2px;font-weight:700;vertical-align:middle}
+.room-tab.preview-room.active{background:linear-gradient(105deg,#883ac2,#6433b7);color:#fff;border-style:solid}
+.room-tab.preview-room.active .room-tag{background:#ffffff26;color:#fff}
+.dev-room{align-self:stretch;text-align:center;border:1px dashed #b683d060;background:radial-gradient(circle at 50% 0%,#753b9925,transparent 70%),#1d1531;border-radius:18px;padding:22px 19px;margin:auto 0}
+.dev-room-icon{display:inline-grid;place-items:center;width:62px;height:62px;margin-bottom:10px;border-radius:18px;background:#904ed035;font-size:34px}
+.dev-room-tag{display:block;width:max-content;max-width:100%;margin:3px auto 10px;color:#e8b8fb;background:#9756ca2f;border:1px solid #c381e75c;padding:5px 10px;border-radius:999px;font-size:10px;letter-spacing:1.4px;font-weight:800}
+.dev-room h3{font-size:clamp(19px,3vw,24px);margin:9px 0 12px;color:#f9efff}
+.dev-room p{color:#cfc0df;line-height:1.6;font-size:13px;max-width:430px;margin:0 auto 12px}
+.dev-room .dev-room-topics{color:#edc7ff;font-size:12px;line-height:2}
+.dev-room .dev-room-note{color:#aa9bbc;font-size:12px;margin-top:13px}
+@media(max-width:480px){.dev-room{padding:19px 13px}.room-tab.preview-room{max-width:300px}.room-tab.preview-room .room-tag{font-size:9px}}
