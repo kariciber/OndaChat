@@ -23,6 +23,18 @@ function notice(message, online = false) {
   el('status-msg').textContent = message;
   el('status-msg').classList.toggle('online', online);
 }
+function authFeedback(message = '') {
+  const feedback = el('auth-feedback');
+  if (!feedback) return;
+  feedback.textContent = message;
+  feedback.hidden = !message;
+}
+function showMusicControls() {
+  const chat = document.querySelector('.chat');
+  chat.classList.remove('tech-active');
+  el('chat-form').removeAttribute('hidden');
+  el('chat-footer').removeAttribute('hidden');
+}
 function draw(items) {
   const box = el('messages');
   box.replaceChildren();
@@ -105,9 +117,7 @@ function setRoom(roomId) {
     return;
   }
   if (techCleanup) {techCleanup(); techCleanup = null;}
-  document.querySelector('.chat').classList.remove('tech-active');
-  el('chat-footer').hidden = false;
-  el('chat-form').hidden = false;
+  showMusicControls();
   if (firebaseContext) {
     subscribeRoom(roomId);
   } else if (roomId !== 'general') {
@@ -210,7 +220,7 @@ function subscribeRoom(roomId) {
     return;
   }
   if (!firebaseContext) return;
-  el('chat-form').hidden = false;
+  showMusicControls();
   if (unsubscribeRoom) {
     unsubscribeRoom();
     unsubscribeRoom = null;
@@ -228,7 +238,7 @@ function subscribeRoom(roomId) {
   draw([]);
 
   unsubscribeRoom = dbApi.onSnapshot(recent, snapshot => {
-    if (generation !== roomGeneration) return;
+    if (generation !== roomGeneration || activeRoom !== roomId) return;
     const items = snapshot.docs.map(doc => {
       const data = doc.data();
       return {
@@ -249,7 +259,7 @@ function subscribeRoom(roomId) {
     el('mode-badge').textContent = 'Chat conectado';
     notice('Sala ' + ROOMS[roomId].label + ' conectada a Firebase. No compartas datos personales.', true);
   }, error => {
-    if (generation !== roomGeneration) return;
+    if (generation !== roomGeneration || activeRoom !== roomId) return;
     console.error('Firestore / sala ' + roomId, error);
     sendRemote = null;
     mode = 'unavailable';
@@ -282,6 +292,7 @@ async function startRealtimeChat() {
 
     function updateAccount(user) {
       const isGoogle = Boolean(user?.providerData?.some(p => p.providerId === 'google.com'));
+      if (isGoogle) authFeedback();
       el('auth-state').textContent = isGoogle
         ? 'Google: ' + (user.displayName || 'Cuenta conectada')
         : user ? 'Participas como invitado' : 'Iniciando sesión...';
@@ -308,6 +319,7 @@ async function startRealtimeChat() {
     googleBtn.disabled = false;
     googleBtn.addEventListener('click', async () => {
       googleBtn.disabled = true;
+      authFeedback();
       try {
         const provider = new authApi.GoogleAuthProvider();
         await authApi.signInWithPopup(auth, provider);
@@ -320,7 +332,7 @@ async function startRealtimeChat() {
           'auth/popup-closed-by-user': 'Has cerrado la ventana de acceso a Google.',
           'auth/account-exists-with-different-credential': 'Esta cuenta ya usa otro método de acceso.'
         };
-        notice(hints[error.code] || 'No se pudo iniciar sesión con Google. Prueba de nuevo.', mode === 'online');
+        authFeedback(hints[error.code] || 'No se pudo iniciar sesión con Google. Prueba de nuevo.');
       } finally {
         googleBtn.disabled = false;
       }
@@ -328,6 +340,7 @@ async function startRealtimeChat() {
     logoutBtn.addEventListener('click', async () => {
       logoutBtn.disabled = true;
       try {
+        authFeedback();
         await authApi.signOut(auth);
         await authApi.signInAnonymously(auth);
       } catch (error) {
