@@ -180,3 +180,10 @@
   .tech-chat-form input,.tech-content input,.tech-content select,.tech-content textarea{font-size:16px}
   .tech-chat-form button{width:100%}
 }
+
+/* Diagnóstico de acceso y recuperación de controles de chat */
+.auth-feedback{margin:0 25px 14px;border:1px solid #c994685e;border-radius:11px;background:#ad6b2a25;color:#f8d3ac;padding:12px 14px;font-size:12px;line-height:1.55}
+.auth-feedback[hidden]{display:none!important}
+.chat:not(.tech-active) #chat-form{display:flex}
+.chat:not(.tech-active) #chat-footer{display:flex}
+@media(max-width:600px){.auth-feedback{margin:0 18px 14px}}
