@@ -124,8 +124,10 @@ export function mountModerationPanel({container,ctx}){
         const batch=dbApi.writeBatch(db);
         batchDocs.forEach(doc=>batch.delete(doc.ref));
         await batch.commit();
-        if(page===9)throw new Error('Hay demasiadas respuestas. Elimina el resto desde Firebase antes de borrar la pregunta.');
+        if(batchDocs.size<100)break;
       }
+      const rest=await dbApi.getDocs(dbApi.query(child,dbApi.limit(1)));
+      if(!rest.empty)throw new Error('Aún quedan respuestas. Revísalas desde Firebase antes de eliminar la pregunta.');
     }
     await dbApi.deleteDoc(ref);
   }
