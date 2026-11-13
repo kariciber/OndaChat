@@ -96,3 +96,14 @@ Hasta publicar esas reglas, los formularios de informática no podrán leer ni e
 - Aprovechar la cuenta de Play Console existente. Una opción es generar un proyecto Android con **Bubblewrap + Trusted Web Activity**, probar un APK y preparar un **AAB** para Play Console.
 - Para una TWA a pantalla completa, la verificación por **Digital Asset Links** requiere alojar `/.well-known/assetlinks.json` **en la raíz del dominio de la web**. Un GitHub Pages de proyecto (ruta `/OndaChat/`) no permite por sí solo colocar ese archivo en la raíz `kariciber.github.io`: habrá que preparar el sitio raíz o un dominio propio.
 - Conservar el keystore y el certificado de firma en lugar seguro. **Nunca subir claves privadas ni credenciales a GitHub**.
+
+
+## Perfiles de usuario (beta)
+- Con una cuenta Google iniciada, pulsa **🎨 Mi perfil** bajo «Tu cuenta».
+- Elige un apodo de 1 a 24 caracteres y uno de ocho avatares simbólicos (🎧 🎤 🎸 💻 🌙 🎨 ✨ 🎮), y guarda.
+- El perfil se guarda de forma privada en `profiles/{uid}`: solo su propietario Google puede leerlo, cambiarlo o eliminarlo directamente desde Firebase. No se almacena el email ni la foto de Google en la colección.
+- Los nuevos mensajes musicales, preguntas, respuestas y mensajes técnicos incluyen la imagen simbólica seleccionada. Las publicaciones anteriores conservan su forma original; los usuarios anónimos siguen participando en las salas musicales con inicial y apodo locales.
+- **Publicar las reglas** de `firestore.rules` en la consola Firebase es obligatorio para guardar perfiles y para permitir mensajes con avatar. GitHub Pages no publica automáticamente reglas de Firestore.
+- En Android abre la PWA instalada y actualiza con conexión a Internet. El service worker `ondachat-static-v2` permite obtener la última interfaz.
+- Las publicaciones son públicas para los usuarios que acceden a sus respectivas salas; por privacidad no se muestra la cuenta de Google ni su correo a los demás.
+- Antes de distribución general, implementar protección antispam del lado del servidor y las obligaciones de privacidad y moderación.
