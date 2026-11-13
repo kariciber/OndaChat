@@ -1,5 +1,5 @@
 /* OndaChat: solo caché de recursos públicos. No almacenar mensajes ni identidad. */
-const CACHE_NAME = 'ondachat-static-v2';
+const CACHE_NAME = 'ondachat-static-v3';
 const SHELL = [
   './', './index.html', './styles.css', './app.js', './firebase-config.js',
   './tech-support.js', './moderation.js', './install.js', './manifest.webmanifest',
