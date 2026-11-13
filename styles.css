@@ -1,1 +1,58 @@
 :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#f8f2ff;color-scheme:dark;background:#0b0718}*{box-sizing:border-box}body{margin:0;min-height:100vh}.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 18% 0%,#44307488,transparent 45%),radial-gradient(ellipse at 95% 45%,#602b5c60,transparent 40%),linear-gradient(150deg,#100b23,#090616)}button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}.shell{max-width:1170px;margin:auto;padding:0 25px}.topbar{display:flex;justify-content:space-between;align-items:center;min-height:82px;border-bottom:1px solid #ffffff1c}.brand{display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:25px;font-weight:800;letter-spacing:-1px}.brand>span:last-child{color:#d9a1ff}.brand-icon{background:linear-gradient(130deg,#f15bb6,#8552e4);padding:8px 12px;border-radius:12px;box-shadow:0 6px 22px #8e49c955}.status{display:flex;gap:9px;align-items:center}.status span,.pill{font-size:12px;border:1px solid #ffffff25;border-radius:25px;padding:8px 11px;background:#ffffff0a;color:#d7c8e5}.live{color:#f8b5d9!important}main{padding:50px 0}.intro{margin-bottom:38px}.eyebrow{font-size:11px;font-weight:800;letter-spacing:2px;color:#c79af5}.intro h1{font-size:clamp(38px,5vw,66px);letter-spacing:-2px;line-height:1.1;margin:16px 0;font-weight:850}.intro h1 em{font-style:normal;background:linear-gradient(100deg,#fa75be,#ac76f6);background-clip:text;-webkit-background-clip:text;color:transparent}.intro p{max-width:610px;line-height:1.65;color:#b6a9c9}.grid{display:grid;grid-template-columns:0.93fr 1.07fr;gap:22px;align-items:stretch}.panel{background:linear-gradient(145deg,#241832ee,#141025ef);border:1px solid #ffffff20;border-radius:24px;box-shadow:0 18px 50px #0004;overflow:hidden}.radio{padding:28px}.signal{float:right;color:#e2a2fa}.artwork{display:grid;place-items:center;height:245px}.vinyl{width:205px;height:205px;border-radius:50%;background:repeating-radial-gradient(circle,#1b1530 0 3px,#292040 4px 6px);display:grid;place-items:center;box-shadow:0 14px 28px #0008,inset 0 0 0 7px #110c22}.vinyl span{width:82px;height:82px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(125deg,#fa65bc,#7e4bdd);font-size:43px}.radio.playing .vinyl{animation:spin 4s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}h2{font-size:23px;margin:8px 0 0}.muted{font-size:13px;color:#b4a9c3}.player{display:flex;align-items:center;gap:14px;border-top:1px solid #ffffff1b;padding-top:20px;margin-top:22px}.round{border:0;border-radius:50%;background:linear-gradient(130deg,#f06daf,#9954ed);color:white;width:53px;height:53px;font-size:19px;flex-shrink:0}.player-info{display:flex;flex:1;flex-direction:column;gap:4px;min-width:0}.player-info strong{font-size:13px}.player-info small{font-size:11px;color:#b2a4c4}#volume{width:75px;accent-color:#ce75f5}.settings{border-top:1px solid #ffffff18;margin-top:20px;padding-top:17px}.settings summary{font-size:13px;color:#d7b5ed;cursor:pointer}.settings label,.settings small{display:block;font-size:12px;margin-top:13px;color:#baadd1}.input-row{display:flex;gap:7px;margin-top:7px}.input-row input{width:100%;min-width:0;flex:1}.input-row button,.identity button{background:#492762;border:1px solid #b578e955;border-radius:9px;color:#fff;padding:0 12px}.chat{min-height:550px;display:flex;flex-direction:column}.chat-title{padding:26px 25px 15px;display:flex;justify-content:space-between;align-items:center;gap:12px}.notice{margin:0 25px 16px;padding:12px;color:#f1d5a6;font-size:12px;line-height:1.5;border:1px solid #d69d4a35;border-radius:11px;background:#c88c3820}.notice.online{color:#b2f2d1;border-color:#42b88355;background:#2d8b5b1a}.identity{padding:0 25px 14px;display:flex;align-items:center;gap:8px}.identity label{color:#c0b4d2;font-size:12px}.identity input{flex:1;min-width:0}.identity button{height:40px}input[type=text],input[type=url]{background:#0e0a1c;border:1px solid #544366;border-radius:10px;padding:10px 12px;color:#fff;outline:0;font-size:13px}input:focus{border-color:#d07df2;box-shadow:0 0 0 2px #d07df222}.messages{flex:1;min-height:260px;max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding:20px 25px;background:#0b081550;border-top:1px solid #ffffff15;border-bottom:1px solid #ffffff15}.empty{text-align:center;margin:auto;color:#9b8da9;font-size:13px}.message{display:flex;gap:10px}.avatar{display:grid;place-items:center;background:#5c337c;border-radius:10px;width:34px;height:34px;flex-shrink:0;font-weight:bold}.message-body{flex:1;min-width:0}.message-head{display:flex;justify-content:space-between;gap:10px}.message-head strong{font-size:13px}.message-head time{font-size:10px;color:#92829f}.message-text{font-size:13px;color:#e4d6ed;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:4px}.composer{display:flex;gap:9px;padding:16px 25px 9px}.composer input{flex:1;min-width:0}.composer button{width:42px;border:0;border-radius:10px;color:white;background:linear-gradient(125deg,#e362b6,#9155ea)}.chat-footer{display:flex;justify-content:space-between;gap:10px;padding:2px 25px 20px;color:#9d8baa;font-size:11px}footer{border-top:1px solid #ffffff18;padding:20px 0 34px;color:#9788a4;font-size:12px;display:flex;justify-content:space-between}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(max-width:800px){.grid{grid-template-columns:1fr}.shell{padding:0 17px}main{padding:35px 0}.artwork{height:210px}.vinyl{width:185px;height:185px}}@media(max-width:480px){.topbar{min-height:69px}.live{display:none}.intro h1{letter-spacing:-1.4px}.chat-title{padding:19px}.notice{margin:0 18px 14px}.identity{padding:0 18px 14px}.messages,.composer{padding-left:18px;padding-right:18px}.chat-footer{padding:2px 18px 18px}footer{display:block;line-height:2}}
+
+/* OndaChat Google + móvil */
+[hidden]{display:none!important}
+.auth-panel{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;padding:10px 25px 17px}
+.auth-copy{display:flex;flex-direction:column;gap:3px;min-width:150px;flex:1}
+.auth-copy strong{font-size:12px;color:#f3e9ff}
+.auth-copy span{font-size:12px;color:#b7a9cc;overflow-wrap:anywhere}
+.google-button,.logout-button{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:8px 13px;border-radius:12px;font-size:13px;font-weight:650;border:1px solid #d7b6f44f;background:#ede8f9;color:#281343}
+.google-button:hover{background:#fff}
+.google-mark{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#fff;color:#4285f4;font-size:17px;font-weight:900}
+.logout-button{background:#462c58;color:#faf5ff}
+.auth-panel button:focus-visible,button:focus-visible{outline:2px solid #e6a5ff;outline-offset:2px}
+@media(max-width:1100px){
+ .grid{grid-template-columns:minmax(0,1fr)}
+ .shell{max-width:800px;padding:0 22px}
+ main{padding:32px 0 26px}
+ .intro{margin-bottom:23px}
+ .intro h1{font-size:clamp(35px,6vw,53px);line-height:1.14;margin:12px 0}
+ .intro p{margin:11px 0;font-size:15px}
+ .radio{padding:23px}
+ .artwork{height:168px}
+ .vinyl{width:155px;height:155px}
+ .vinyl span{width:65px;height:65px;font-size:31px}
+ .chat{min-height:380px}
+ .messages{min-height:220px}
+ .panel{border-radius:21px}
+}
+@media(max-width:600px){
+ .shell{padding:0 15px}
+ .topbar{min-height:72px}
+ .brand{font-size:22px}
+ .brand-icon{padding:7px 10px}
+ .status #mode-badge{font-size:10px;padding:7px}
+ main{padding:24px 0}
+ .intro h1{font-size:clamp(33px,9vw,44px)}
+ .intro p{font-size:14px;line-height:1.5}
+ .radio{padding:18px}
+ .artwork{height:150px}
+ .vinyl{width:135px;height:135px}
+ .vinyl span{width:59px;height:59px}
+ .chat-title{padding:20px 18px 12px}
+ .chat-title h2{font-size:21px}
+ .pill{font-size:10px;padding:6px 8px}
+ .notice{margin:0 18px 12px}
+ .auth-panel{padding:6px 18px 13px;align-items:stretch;flex-direction:column;gap:8px}
+ .auth-copy{min-width:0}
+ .auth-panel button{width:100%}
+ .identity{flex-wrap:wrap;gap:7px;padding:0 18px 14px}
+ .identity label{width:100%}
+ .identity input{min-width:0}
+ .identity button{height:41px;min-width:45px}
+ .messages{padding:17px 18px;max-height:360px;min-height:200px}
+ .composer{padding:13px 18px 8px}
+ .chat-footer{padding:2px 18px 17px}
+ #volume{width:67px}
+ footer{padding:18px 0 24px}
+}
