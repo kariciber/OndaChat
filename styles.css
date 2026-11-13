@@ -323,3 +323,37 @@ html,body{max-width:100%;overflow-x:clip}
   #volume{width:55px}
   .tech-symbol{width:46px;height:46px}
 }
+
+
+/* OndaChat v4: navegación inferior móvil */
+.mobile-bottom-nav{display:none}
+@media(max-width:800px){
+  body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .mobile-bottom-nav{
+    position:fixed;left:0;right:0;bottom:0;z-index:100;
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;
+    gap:7px;padding:8px max(12px,env(safe-area-inset-right,0px)) calc(9px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));
+    background:#180f2bee;border-top:1px solid #ae78d064;
+    box-shadow:0 -8px 24px #0804159c;
+    -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)
+  }
+  .mobile-bottom-nav .mobile-nav-button{
+    min-width:0;min-height:55px;border:1px solid transparent;border-radius:14px;
+    display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;
+    padding:6px 4px;background:transparent;color:#d4bfe8;
+    font-size:12px;font-weight:750;line-height:1.2;touch-action:manipulation
+  }
+  .mobile-bottom-nav .mobile-nav-icon{font-size:22px;line-height:1.12}
+  .mobile-bottom-nav .mobile-nav-button.active{
+    color:#fff;background:linear-gradient(120deg,#8745b7,#6336ac);
+    border-color:#c987ef9a;box-shadow:0 3px 13px #5e279c45
+  }
+  .mobile-bottom-nav .mobile-nav-button:focus-visible{
+    outline:2px solid #f2baff;outline-offset:2px
+  }
+  .radio,.chat,.profile-settings,.auth-panel{scroll-margin-top:14px;scroll-margin-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+}
+@media(max-width:350px){
+  .mobile-bottom-nav{gap:4px;padding-left:7px;padding-right:7px}
+  .mobile-bottom-nav .mobile-nav-button{font-size:11px}
+}
