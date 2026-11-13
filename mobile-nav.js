@@ -8,7 +8,7 @@
   const scrollToElement = (element) => {
     if (!element) return;
     element.scrollIntoView({
-      behavior: reducedMotion() ? 'instant' : 'smooth',
+      behavior: reducedMotion() ? 'auto' : 'smooth',
       block: 'start',
       inline: 'nearest'
     });
