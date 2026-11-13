@@ -107,3 +107,12 @@ Hasta publicar esas reglas, los formularios de informática no podrán leer ni e
 - En Android abre la PWA instalada y actualiza con conexión a Internet. El service worker `ondachat-static-v2` permite obtener la última interfaz.
 - Las publicaciones son públicas para los usuarios que acceden a sus respectivas salas; por privacidad no se muestra la cuenta de Google ni su correo a los demás.
 - Antes de distribución general, implementar protección antispam del lado del servidor y las obligaciones de privacidad y moderación.
+
+
+## Navegación inferior en Android (PWA v4)
+- Barra violeta de acceso rápido visible en pantallas hasta 800px, con tres opciones: **🎶 Radio**, **💬 Salas** y **👤 Mi perfil**.
+- Radio lleva al reproductor, Salas al listado de conversaciones y Mi perfil abre el editor para usuarios con Google conectado.
+- Para invitados, Mi perfil lleva al botón «Entrar con Google» sin abrir el inicio de sesión automáticamente.
+- Se conserva la sala musical/técnica seleccionada y el estado del reproductor al navegar; no hay recarga de página.
+- El aviso del centro técnico distingue entre sesión Google iniciada y sesión invitada.
+- Service worker `ondachat-static-v4`: actualiza los archivos de la interfaz instalada sin guardar los mensajes de Firebase en caché.
