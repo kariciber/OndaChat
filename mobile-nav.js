@@ -24,6 +24,11 @@
   for (const button of buttons) {
     button.addEventListener('click', () => {
       const target = button.dataset.target;
+      // Al salir de «Mi perfil», plegar su editor sin modificar los datos.
+      if (target === 'radio' || target === 'salas') {
+        const profile = document.getElementById('profile-settings');
+        if (profile) profile.open = false;
+      }
       if (target === 'radio') {
         activate(target);
         scrollToElement(document.querySelector('.radio'));
