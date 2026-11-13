@@ -230,7 +230,9 @@ function showPreviewRoom() {
   document.querySelector('.chat').classList.add('tech-active');
   el('chat-footer').hidden = true;
   el('mode-badge').textContent = 'Sala en desarrollo';
-  notice('Centro de informática en pruebas. Para participar, inicia sesión con Google.');
+  notice(signedInGoogle()
+    ? 'Centro de informática en pruebas. Sesión Google conectada. Ya puedes participar.'
+    : 'Centro de informática en pruebas. Para participar, inicia sesión con Google.', signedInGoogle());
   try {
     techCleanup = mountTechSupport({
       container: el('messages'),
