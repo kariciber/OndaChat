@@ -2,9 +2,9 @@ import { firebaseConfig } from './firebase-config.js';
 import { mountTechSupport } from './tech-support.js';
 
 const el = id => document.getElementById(id);
-const STORE = { name: 'ondachat:nickname', messages: 'ondachat:demo', stream: 'ondachat:stream' };
+const STORE = { name: 'ondachat:nickname', stream: 'ondachat:stream' };
 const MAX_MESSAGES = 60, MAX_LENGTH = 300;
-let mode = 'demo', sendRemote = null, lastSent = 0, messages = [];
+let mode = 'loading', sendRemote = null, lastSent = 0, messages = [];
 const ROOMS = Object.freeze({
   general: { title: 'Sala general 💬', label: 'General' },
   pop: { title: 'Sala Pop 🎤', label: 'Pop' },
@@ -76,12 +76,14 @@ el('save-nickname').addEventListener('click', () => {
 el('message-input').addEventListener('input', () => {
   el('counter').textContent = el('message-input').value.length + '/' + MAX_LENGTH;
 });
-try { messages = JSON.parse(load(STORE.messages)) || []; } catch { messages = []; }
-if (!Array.isArray(messages)) messages = [];
-messages = messages.slice(-MAX_MESSAGES);
-draw(messages);
+// Nunca recuperar mensajes locales en una sala conectada: podrían parecer
+// mensajes compartidos y mezclarse con otros chats. Firestore es la fuente única.
+draw([]);
+el('send-btn').disabled = true;
+notice('Conectando con el chat de Firebase...');
 
 function showPreviewRoom() {
+  draw([]);
   if (unsubscribeRoom) {
     unsubscribeRoom();
     unsubscribeRoom = null;
@@ -96,15 +98,31 @@ function showPreviewRoom() {
   el('chat-footer').hidden = true;
   el('mode-badge').textContent = 'Sala en desarrollo';
   notice('Centro de informática en pruebas. Para participar, inicia sesión con Google.');
-  techCleanup = mountTechSupport({
-    container: el('messages'),
-    firebaseContext,
-    nickname: name
-  });
+  try {
+    techCleanup = mountTechSupport({
+      container: el('messages'),
+      firebaseContext,
+      nickname: name
+    });
+  } catch (error) {
+    console.error('Sala informática', error);
+    const info = document.createElement('p');
+    info.className = 'tech-empty';
+    info.textContent = 'No se pudo cargar el centro de informática. Prueba a recargar la página.';
+    el('messages').replaceChildren(info);
+  }
 }
 
 function setRoom(roomId) {
   if (!Object.hasOwn(ROOMS, roomId)) return;
+  // Aislamiento estricto: borrar mensajes y estado de la sala anterior ANTES
+  // de activar la nueva. No mostramos nunca cachés de otra conversación.
+  if (unsubscribeRoom) { unsubscribeRoom(); unsubscribeRoom = null; }
+  ++roomGeneration;
+  sendRemote = null;
+  mode = 'loading';
+  el('send-btn').disabled = true;
+  draw([]);
   activeRoom = roomId;
   el('chat-title').textContent = ROOMS[roomId].title;
   document.querySelectorAll('.room-tab').forEach(button => {
@@ -118,18 +136,12 @@ function setRoom(roomId) {
   }
   if (techCleanup) {techCleanup(); techCleanup = null;}
   showMusicControls();
-  if (firebaseContext) {
+  if (firebaseContext?.auth?.currentUser) {
     subscribeRoom(roomId);
-  } else if (roomId !== 'general') {
-    draw([]);
-    mode = 'unavailable';
-    el('send-btn').disabled = true;
-    notice('Esta sala necesita la conexión a Firebase. Vuelve a General para la demostración.');
   } else {
-    draw(messages);
-    mode = 'demo';
-    el('send-btn').disabled = false;
-    notice('Modo demo local: los mensajes se guardan solo en este navegador.');
+    mode = 'unavailable';
+    el('mode-badge').textContent = 'Sin conexión';
+    notice('No hay conexión con Firebase. Los mensajes de esta sala no están disponibles.');
   }
 }
 document.querySelectorAll('.room-tab').forEach(button => {
@@ -144,30 +156,27 @@ el('chat-form').addEventListener('submit', async event => {
     notice('Espera dos segundos antes de enviar otro mensaje.', mode === 'online');
     return;
   }
-  if (mode !== 'online' && !(mode === 'demo' && activeRoom === 'general')) {
-    notice('Esta sala todavía no permite enviar mensajes. Revisa las reglas de Firebase.');
+  if (mode !== 'online' || typeof sendRemote !== 'function') {
+    notice('Espera a que esta sala se conecte con Firebase antes de enviar.');
     return;
   }
   const nickname = name();
   el('nickname').value = nickname;
   save(STORE.name, nickname);
+  const roomWhenSent = activeRoom;
+  const sendToCurrentRoom = sendRemote;
   el('send-btn').disabled = true;
   try {
-    if (mode === 'online' && sendRemote) {
-      await sendRemote({ nickname, text });
-    } else if (mode === 'demo') {
-      messages.push({ nickname, text, createdAt: new Date().toISOString() });
-      messages = messages.slice(-MAX_MESSAGES);
-      save(STORE.messages, JSON.stringify(messages));
-      draw(messages);
-    }
+    await sendToCurrentRoom({ nickname, text });
     lastSent = Date.now();
     el('message-input').value = '';
     el('counter').textContent = '0/' + MAX_LENGTH;
   } catch (error) {
     console.error(error);
     notice('No se pudo enviar el mensaje. Comprueba la conexión.', false);
-  } finally { el('send-btn').disabled = false; }
+  } finally {
+    el('send-btn').disabled = !(mode === 'online' && roomWhenSent === activeRoom);
+  }
 });
 
 // La emisión no está activa hasta que se introduce una URL de audio HTTPS.
@@ -221,6 +230,10 @@ function subscribeRoom(roomId) {
   }
   if (!firebaseContext) return;
   showMusicControls();
+  // Unsubscribe antes de iniciar cada consulta y limpiar todo dato previo.
+  sendRemote = null;
+  el('send-btn').disabled = true;
+  draw([]);
   if (unsubscribeRoom) {
     unsubscribeRoom();
     unsubscribeRoom = null;
@@ -273,7 +286,9 @@ function subscribeRoom(roomId) {
 
 async function startRealtimeChat() {
   if (!firebaseConfig.apiKey || !firebaseConfig.projectId || !firebaseConfig.appId) {
-    el('auth-state').textContent = 'Modo de demostración';
+    el('auth-state').textContent = 'Configuración pendiente';
+    mode = 'unavailable';
+    notice('El chat necesita una configuración válida de Firebase.');
     return;
   }
   try {
@@ -302,16 +317,18 @@ async function startRealtimeChat() {
     authApi.onAuthStateChanged(auth, user => {
       updateAccount(user);
       if (!user) {
-        if (unsubscribeRoom) {
-          unsubscribeRoom();
-          unsubscribeRoom = null;
-        }
+        if (unsubscribeRoom) { unsubscribeRoom(); unsubscribeRoom = null; }
         ++roomGeneration;
-        mode = 'unavailable';
         sendRemote = null;
+        mode = 'unavailable';
         el('send-btn').disabled = true;
+        draw([]);
         el('mode-badge').textContent = 'Conectando...';
         notice('Preparando tu sesión...');
+        if (ROOMS[activeRoom].preview) showPreviewRoom();
+      } else if (ROOMS[activeRoom].preview) {
+        // Actualiza el estado Google/Invitado sin mostrar el chat General.
+        showPreviewRoom();
       } else {
         subscribeRoom(activeRoom);
       }
@@ -354,11 +371,16 @@ async function startRealtimeChat() {
     console.error('Firebase', error);
     firebaseContext = null;
     sendRemote = null;
-    mode = activeRoom === 'general' ? 'demo' : 'unavailable';
-    el('send-btn').disabled = activeRoom !== 'general';
-    el('mode-badge').textContent = 'Demo local';
+    mode = 'unavailable';
+    el('send-btn').disabled = true;
+    el('mode-badge').textContent = 'Sin conexión';
     el('auth-state').textContent = 'Acceso no disponible';
-    notice('Firebase no está disponible. Solo la sala General permite una demostración local.');
+    draw([]);
+    if (ROOMS[activeRoom].preview) {
+      showPreviewRoom();
+    } else {
+      notice('No hay conexión con Firebase. Por seguridad, no se mostrarán mensajes locales de otras salas.');
+    }
   }
 }
 startRealtimeChat();
