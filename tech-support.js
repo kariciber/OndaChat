@@ -3,6 +3,8 @@
  * Vista preliminar hasta publicar reglas específicas de Firestore.
  * Nunca muestra HTML recibido de usuarios: todo se inserta con textContent.
  */
+import { isModerator, mountModerationPanel } from './moderation.js';
+
 const CATEGORIES = Object.freeze([
   ['windows','🪟 Windows'],
   ['linux','🐧 Linux'],
@@ -27,7 +29,7 @@ const catLabel = id => CATEGORIES.find(x => x[0] === id)?.[1] || '💡 Otras dud
 const authIsGoogle = user => !!user?.providerData?.some(provider => provider.providerId === 'google.com');
 
 export function mountTechSupport({container, firebaseContext, nickname}) {
-  let stopped = false, stopList = null, stopDetail = null, stopQuestion = null, view = 'questions';
+  let stopped = false, stopList = null, stopDetail = null, stopQuestion = null, modCleanup = null, view = 'questions';
   let questionItems = [], lastPublish = 0, currentQuestionId = null;
   const ctx = firebaseContext;
   const user = ctx?.auth?.currentUser;
@@ -49,7 +51,9 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
   const questionsBtn = create('button','tech-tab selected','❓ Preguntas');
   const chatBtn = create('button','tech-tab','💬 Conversar');
   const guideBtn = create('button','tech-tab','📋 Normas');
-  [questionsBtn,chatBtn,guideBtn].forEach(b=>{b.type='button';tabs.append(b);});
+  const moderatorBtn = create('button','tech-tab','🛡️ Moderación');
+  [questionsBtn,chatBtn,guideBtn,moderatorBtn].forEach(b=>b.type='button');
+  [questionsBtn,chatBtn,guideBtn].forEach(b=>tabs.append(b));
   root.append(tabs);
   const content = create('div','tech-content');
   root.append(content);
@@ -58,6 +62,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
     if (stopList) {stopList();stopList=null;}
     if (stopDetail) {stopDetail();stopDetail=null;}
     if (stopQuestion) {stopQuestion();stopQuestion=null;}
+    if (modCleanup) {modCleanup();modCleanup=null;}
     currentQuestionId = null;
   };
   const message = (txt, cls='') => {
@@ -70,13 +75,13 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
     }
     return true;
   };
-  async function report(type,id) {
+  async function report(type,id,parentId='') {
     if (!ready || !confirm('¿Quieres enviar esta publicación para revisión por moderación?')) return;
     try {
       const { dbApi, db } = ctx;
       const key = user.uid + '_' + type + '_' + id;
       await dbApi.setDoc(dbApi.doc(db,'techReports',key), {
-        uid:user.uid,resourceType:type,resourceId:id,
+        uid:user.uid,resourceType:type,resourceId:id,parentId,
         reason:'contenido_inapropiado',createdAt:dbApi.serverTimestamp()
       });
       alert('Aviso recibido. Se revisará desde la consola de moderación.');
@@ -85,10 +90,10 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
       alert('No se pudo registrar el aviso. Comprueba si las reglas nuevas están publicadas.');
     }
   }
-  function reportButton(type,id,ownerId) {
+  function reportButton(type,id,ownerId,parentId='') {
     if (!ready || ownerId === user.uid) return null;
     const b = create('button','tech-report','Denunciar');
-    b.type='button'; b.addEventListener('click',()=>report(type,id));
+    b.type='button'; b.addEventListener('click',()=>report(type,id,parentId));
     return b;
   }
   function renderQuestions() {
@@ -271,7 +276,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
           });
           article.append(acceptBtn);
         }
-        const reportBtn=reportButton('answer',doc.id,data.uid);
+        const reportBtn=reportButton('answer',doc.id,data.uid,id);
         if (reportBtn) article.append(reportBtn);
         answers.append(article);
       });
@@ -338,7 +343,7 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
         const head=create('div','tech-question-foot');
         head.append(create('strong','',short(data.nickname,24)),create('span','',clock(data.createdAt)));
         card.append(head,create('p','',short(data.text,300)));
-        const b=reportButton('chat',doc.id,data.uid);
+        const b=reportButton('chat',doc.id,data.uid,'informatica');
         if(b)card.append(b);
         list.append(card);
       });
@@ -381,13 +386,23 @@ export function mountTechSupport({container, firebaseContext, nickname}) {
     questionsBtn.classList.toggle('selected',tab==='questions');
     chatBtn.classList.toggle('selected',tab==='chat');
     guideBtn.classList.toggle('selected',tab==='guide');
+    moderatorBtn.classList.toggle('selected',tab==='moderation');
     if(tab==='questions')renderQuestions();
     else if(tab==='chat')renderChat();
+    else if(tab==='moderation') {
+      modCleanup=mountModerationPanel({container:content,ctx});
+    }
     else renderGuide();
   }
   questionsBtn.addEventListener('click',()=>activate('questions'));
   chatBtn.addEventListener('click',()=>activate('chat'));
   guideBtn.addEventListener('click',()=>activate('guide'));
+  moderatorBtn.addEventListener('click',()=>activate('moderation'));
+  if(ready){
+    isModerator(ctx).then(allowed=>{
+      if(!stopped && allowed)tabs.append(moderatorBtn);
+    }).catch(error=>console.warn('Moderación no disponible',error));
+  }
   activate('questions');
   return () => {stopped=true;disposeSubscriptions();};
 }
