@@ -252,3 +252,74 @@
 .profile-preview{font-size:13px;color:#f4dcff}
 .profile-feedback{font-size:12px;line-height:1.5;color:#cdb3dc;min-height:16px;margin:0}
 @media(max-width:600px){.profile-settings{margin:0 16px 15px}.profile-form{padding:0 12px 15px}.profile-avatar{width:45px;height:45px}}
+
+
+/* OndaChat · optimización móvil v3: sin desbordamiento lateral */
+html,body{max-width:100%;overflow-x:clip}
+.shell,.grid,.panel,.chat,.radio,.tech-center,.tech-content,.profile-settings{min-width:0;max-width:100%}
+.chat-title>div,.tech-head-copy,.message-body,.auth-copy,.intro{min-width:0}
+.intro h1,.chat-title h2,.radio h2,.tech-head-copy h3{overflow-wrap:break-word}
+.message-text,.notice,.profile-tip,.auth-feedback,.tech-question,.tech-answer{overflow-wrap:anywhere}
+.rooms-nav{display:flex;align-items:center;width:100%;min-width:0;max-width:100%}
+.rooms-nav>.rooms{flex:1 1 auto;width:0;min-width:0}
+.rooms-arrow{display:none;border:1px solid #8766a2;background:#302044;color:#f2daff;font-size:30px;font-weight:600;line-height:1;border-radius:12px;min-height:45px;min-width:38px}
+.rooms-arrow:hover,.rooms-arrow:focus-visible{border-color:#dca5f9;background:#583173}
+@media(max-width:600px){
+  .shell{width:100%;max-width:100%;padding-inline:12px}
+  .grid{grid-template-columns:minmax(0,1fr);gap:14px;width:100%}
+  .panel{width:100%;min-width:0;overflow:hidden}
+  main{padding-block:20px}
+  .topbar{min-width:0;gap:8px}
+  .brand{font-size:20px;min-width:0;white-space:nowrap}
+  .brand-icon{flex-shrink:0}
+  .status{flex:0 1 auto;min-width:0;justify-content:flex-end;flex-wrap:wrap;gap:5px}
+  .status span{font-size:10px;padding:6px 8px}
+  .intro h1{font-size:clamp(32px,9vw,44px);line-height:1.15}
+  .intro p{font-size:15px}
+  .radio{padding:18px 17px}
+  .radio .player{width:100%;min-width:0}
+  .radio .player-info{overflow-wrap:anywhere}
+  .chat-title{gap:8px;align-items:flex-start;padding:18px 16px 10px}
+  .chat-title h2{font-size:19px;line-height:1.35}
+  .chat-title .pill{flex-shrink:0;max-width:115px;text-align:center}
+  .rooms-nav{gap:4px;padding-inline:7px;margin-bottom:12px}
+  .rooms-nav>.rooms{padding:1px 2px 4px;gap:7px;scrollbar-width:none}
+  .rooms::-webkit-scrollbar{display:none}
+  .rooms-arrow{display:grid;place-items:center;flex:0 0 36px}
+  .room-tab{min-height:46px;padding:11px 13px;font-size:13px}
+  .notice{margin-inline:16px;font-size:12px}
+  .auth-panel{padding-inline:16px}
+  .identity{padding-inline:16px}
+  .messages{padding:14px 16px;min-height:180px;max-height:45dvh}
+  .message-text{font-size:14px;line-height:1.5}
+  .message-head strong{font-size:13px}
+  .composer{padding:13px 16px 8px;align-items:stretch}
+  .composer input,.identity input{font-size:16px;min-height:46px}
+  .composer button{min-width:48px;min-height:48px}
+  .chat-footer{padding-inline:16px}
+  .profile-settings{margin-inline:16px}
+  .profile-settings>summary{line-height:1.5}
+  .chat.tech-active .messages{max-height:none;min-height:300px;padding-inline:13px}
+  .tech-tabs{gap:7px}
+  .tech-tab{min-height:45px;flex:1 1 auto}
+  .tech-question,.tech-answer,.tech-chat-message{padding:13px}
+  .tech-head{gap:10px}
+  .tech-badges span{white-space:normal}
+  footer{overflow-wrap:anywhere}
+}
+@media(max-width:375px){
+  .shell{padding-inline:9px}
+  .chat-title{padding-inline:12px}
+  .chat-title h2{font-size:18px}
+  .room-tab{font-size:12px}
+  .rooms-arrow{min-width:32px;flex-basis:32px}
+  .notice{margin-inline:12px}
+  .auth-panel,.identity{padding-inline:12px}
+  .messages{padding-inline:12px}
+  .composer{padding-inline:12px}
+  .chat-footer{padding-inline:12px}
+  .profile-settings{margin-inline:12px}
+  .player{gap:7px}
+  #volume{width:55px}
+  .tech-symbol{width:46px;height:46px}
+}
