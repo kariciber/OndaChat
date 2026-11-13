@@ -50,7 +50,23 @@ service cloud.firestore {
         && request.resource.data.details.size() <= 1200
         && request.resource.data.status == 'abierta'
         && request.resource.data.createdAt == request.time;
-      allow update, delete: if false;
+
+      // Solo quien hizo la pregunta puede elegir una respuesta como solución.
+      // Se conservan los campos originales, permitiendo cambiar únicamente
+      // el estado y la referencia a una respuesta realmente existente.
+      allow update: if isGoogleUser()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status','solutionAnswerId'])
+        && request.resource.data.keys().hasOnly(
+             ['uid','nickname','category','title','details','status','createdAt','solutionAnswerId'])
+        && request.resource.data.status == 'resuelta'
+        && request.resource.data.solutionAnswerId is string
+        && request.resource.data.solutionAnswerId.size() > 0
+        && request.resource.data.solutionAnswerId.size() <= 80
+        && exists(/databases/$(database)/documents/techQuestions/$(questionId)/answers/$(request.resource.data.solutionAnswerId));
+      allow delete: if false;
 
       match /answers/{answerId} {
         allow read: if isGoogleUser();
