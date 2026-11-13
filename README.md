@@ -5,7 +5,8 @@ Primera versión de una aplicación de radio y comunidad en español.
 ## Estado actual
 - Diseño adaptable a móviles y ordenadores, con vista móvil apilada y controles amplios.
 - Reproductor de radio con URL directa HTTPS que configura cada usuario.
-- Chat **local de demostración**: los mensajes se guardan únicamente en el navegador de quien escribe.
+- Chat **local de demostración** si Firebase no está disponible, solo en General.
+- Salas General, Pop, Rock, Electrónica y Chill con mensajes independientes cuando las reglas de Firestore estén publicadas.
 - Archivos preparados para conectar Firebase Authentication y Cloud Firestore.
 - **Acceso con Google integrado en el código**, pendiente de habilitar Google en Firebase Authentication y autorizar el dominio de GitHub Pages.\n- Facebook Login **pendiente**. Todavía no está conectado.
 - No se ha desplegado un sitio web público.
@@ -34,6 +35,6 @@ En «Configurar emisión», introducir una URL HTTPS **directa** de audio reprod
 - Añadir inicio de sesión con Facebook mediante Firebase Authentication y Meta Developers; después crear salas por géneros.
 - Implementar moderación, reportes y políticas de privacidad.
 - Publicar en un dominio cuando la versión sea segura.
-- Personalizar salas, emisoras e identidad visual.
+- Moderación y perfiles, presencia de usuarios conectados y personalización de emisoras.
 
 **Seguridad:** Las claves privadas de servicio, tokens de Meta y contraseñas nunca deben añadirse al repositorio público.
