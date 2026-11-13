@@ -118,3 +118,65 @@
 .dev-room .dev-room-topics{color:#edc7ff;font-size:12px;line-height:2}
 .dev-room .dev-room-note{color:#aa9bbc;font-size:12px;margin-top:13px}
 @media(max-width:480px){.dev-room{padding:19px 13px}.room-tab.preview-room{max-width:300px}.room-tab.preview-room .room-tag{font-size:9px}}
+
+/* Centro de ayuda informática: preguntas, hilos y conversación */
+.chat.tech-active .messages{display:block;max-height:none;min-height:480px;overflow:visible;padding:18px 24px}
+.chat.tech-active{min-height:unset}
+.tech-center{display:flex;flex-direction:column;gap:15px;min-width:0;color:#f8efff}
+.tech-head{display:flex;align-items:center;gap:14px;padding:12px 8px 0}
+.tech-symbol{font-size:38px;flex-shrink:0;display:grid;place-items:center;width:65px;height:65px;border-radius:18px;background:linear-gradient(135deg,#9b4aba60,#5337a460);box-shadow:inset 0 0 0 1px #c879d54d}
+.tech-head-copy h3{margin:0 0 6px;font-size:clamp(19px,2.4vw,24px)}
+.tech-head-copy p{margin:0;color:#c5b3d4;font-size:13px;line-height:1.5}
+.tech-badges{display:flex;flex-wrap:wrap;gap:8px}
+.tech-badges span{font-size:11px;color:#d0b5ea;border:1px solid #7b579477;background:#4c2c6238;padding:8px 12px;border-radius:999px}
+.tech-warning{font-size:12px;line-height:1.55;color:#f0dca7;padding:11px 13px;background:#8c621c2a;border:1px solid #bb874b59;border-radius:12px;margin:0}
+.tech-tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tech-tab{background:#251a38;border:1px solid #79529d;color:#e0cde9;border-radius:10px;padding:11px 13px;min-height:43px;font-weight:700;font-size:13px}
+.tech-tab.selected{background:linear-gradient(115deg,#a847c1,#7545d4);border-color:#c17df3;color:white}
+.tech-content{min-width:0}
+.tech-content input,.tech-content textarea,.tech-content select{background:#140e25;border:1px solid #6c4a83;border-radius:10px;color:#f8eaff;font-size:14px;padding:12px;min-width:0;max-width:100%;width:100%;font:inherit}
+.tech-content input:focus,.tech-content textarea:focus,.tech-content select:focus{outline:2px solid #c779ee;outline-offset:1px}
+.tech-content textarea{resize:vertical;line-height:1.5}
+.tech-content button{font:inherit;cursor:pointer}
+.tech-section-title{margin:4px 0 9px;font-size:17px}
+.tech-subtitle{color:#bba9ca;font-size:13px;line-height:1.6;margin:0 0 17px}
+.tech-gate,.tech-empty{padding:18px 14px;border-radius:12px;background:#271b38;border:1px dashed #8664a1;color:#d6c4ea;text-align:center;line-height:1.6;font-size:13px}
+.tech-new-question{margin-bottom:20px;padding:12px 14px;border:1px solid #ab72d284;border-radius:12px;background:#4c2b652a}
+.tech-new-question summary{font-size:14px;color:#eec7ff;font-weight:700;cursor:pointer}
+.tech-question-form,.tech-answer-form{display:flex;flex-direction:column;gap:10px;margin-top:13px}
+.tech-primary{background:linear-gradient(120deg,#e466be,#8751e6);padding:11px 16px;border-radius:11px;color:white;border:0;min-height:44px;align-self:start;font-weight:700}
+.tech-primary:disabled{opacity:.5;cursor:not-allowed}
+.tech-feedback{font-size:12px;color:#d3bce4;min-height:14px;margin:0}
+.tech-filter-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0 15px;color:#c8b6d9;font-size:12px}
+.tech-filter-row select{width:auto;max-width:65%}
+.tech-question-list,.tech-answer-list{display:flex;flex-direction:column;gap:10px}
+.tech-question,.tech-answer,.tech-chat-message{padding:15px;border:1px solid #714c8b85;border-radius:12px;background:linear-gradient(135deg,#322045bb,#21172d)}
+.tech-question-meta,.tech-question-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;color:#b7a8c7}
+.tech-category{color:#e9b4fa;background:#71359350;border-radius:999px;padding:6px 9px;font-size:11px}
+.tech-question-title{padding:10px 0 7px;background:none;border:none;text-align:left;color:#f9eeff;font-size:16px;font-weight:800;line-height:1.35}
+.tech-question-title:hover{text-decoration:underline;color:#ffbdf3}
+.tech-excerpt,.tech-full-description,.tech-answer p,.tech-chat-message p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.6;color:#e5d5ef;margin:5px 0 12px}
+.tech-report,.tech-back{font-size:12px;background:transparent;border:1px solid #76538d;color:#d1a8e8;padding:7px 10px;border-radius:9px}
+.tech-report:hover,.tech-back:hover{background:#57316f}
+.tech-thread-title{font-size:18px;margin:12px 0;color:#f6e5ff}
+.tech-question-by{font-size:11px;color:#ad9cbb}
+.tech-back{margin:0 0 15px}
+.tech-answer-list{margin:10px 0 20px}
+.tech-chat-messages{display:flex;flex-direction:column;gap:10px;max-height:480px;overflow-y:auto;padding-right:4px}
+.tech-chat-form{display:flex;gap:9px;margin:13px 0}
+.tech-chat-form input{flex:1;min-width:0}
+.tech-note{color:#cfafe6}
+.tech-guide{border:1px solid #714c8b85;border-radius:15px;padding:15px;background:#2d1e40}
+.tech-guide p{color:#e7d7ef;font-size:13px;line-height:1.7}
+@media(max-width:600px){
+  .chat.tech-active .messages{padding:13px 15px}
+  .tech-head{align-items:flex-start;padding:8px 1px}
+  .tech-symbol{width:52px;height:52px;font-size:27px}
+  .tech-head-copy h3{font-size:19px}
+  .tech-badges span{font-size:10px}
+  .tech-filter-row{align-items:stretch;flex-direction:column}
+  .tech-filter-row select{max-width:100%}
+  .tech-chat-form{flex-direction:column}
+  .tech-chat-form input,.tech-content input,.tech-content select,.tech-content textarea{font-size:16px}
+  .tech-chat-form button{width:100%}
+}
