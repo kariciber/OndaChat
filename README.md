@@ -40,6 +40,12 @@ En «Configurar emisión», introducir una URL HTTPS **directa** de audio reprod
 **Seguridad:** Las claves privadas de servicio, tokens de Meta y contraseñas nunca deben añadirse al repositorio público.
 
 
+## Estado de las preguntas
+- La persona autora de una pregunta puede pulsar «✓ Marcar como solución» debajo de una respuesta.
+- Cuando se marca una respuesta, aparece «✅ Resuelta» en la lista y «✅ Solución aceptada» en el hilo. También puede elegir otra respuesta como solución posteriormente.
+- Las nuevas reglas de `firestore.rules` permiten actualizar únicamente los campos de estado y respuesta aceptada, siempre por la persona autora.
+- **Importante:** tras actualizar `firestore.rules` en GitHub, también hay que copiarlas y publicarlas en Firebase Console → Cloud Firestore → Reglas. GitHub no despliega automáticamente las reglas a Firebase.
+
 ## Sala de técnicos de informática (beta, en desarrollo)
 - Panel violeta de **Preguntas**, **Conversar** y **Normas**.
 - Preguntas categorizadas (Windows, Linux, redes, hardware, seguridad, programación y otras), respuestas en hilos y chat en tiempo real.
