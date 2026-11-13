@@ -325,9 +325,9 @@ html,body{max-width:100%;overflow-x:clip}
 }
 
 
-/* OndaChat v4: navegación inferior móvil */
+/* OndaChat v6: navegación inferior para móvil y PWA con viewport ancho */
 .mobile-bottom-nav{display:none}
-@media(max-width:800px){
+@media(max-width:1100px), (display-mode:standalone) and (max-width:1400px){
   body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   .mobile-bottom-nav{
     position:fixed;left:0;right:0;bottom:0;z-index:100;
