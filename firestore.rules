@@ -5,11 +5,23 @@ service cloud.firestore {
       return request.auth != null
         && request.auth.token.firebase.sign_in_provider == 'google.com';
     }
+    function isModerator() {
+      return isGoogleUser()
+        && exists(/databases/$(database)/documents/moderators/$(request.auth.uid))
+        && get(/databases/$(database)/documents/moderators/$(request.auth.uid)).data.active == true;
+    }
     function musicRoom(roomId) {
       return roomId in ['general', 'pop', 'rock', 'electronica', 'chill'];
     }
     function techRoom(roomId) {
       return roomId == 'informatica' && isGoogleUser();
+    }
+
+    // El rol solo lo crea una persona propietaria desde Firebase Console/Admin SDK.
+    // Nunca se puede conceder a sí mismo desde el navegador.
+    match /moderators/{moderatorUid} {
+      allow get: if isGoogleUser() && request.auth.uid == moderatorUid;
+      allow list, create, update, delete: if false;
     }
 
     // Las cinco salas musicales actuales siguen accesibles con sesión anónima.
@@ -28,7 +40,8 @@ service cloud.firestore {
         && request.resource.data.text.size() > 0
         && request.resource.data.text.size() <= 300
         && request.resource.data.createdAt == request.time;
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if isModerator();
     }
 
     // Centro de preguntas y respuestas técnicas en pruebas.
@@ -66,7 +79,7 @@ service cloud.firestore {
         && request.resource.data.solutionAnswerId.size() > 0
         && request.resource.data.solutionAnswerId.size() <= 80
         && exists(/databases/$(database)/documents/techQuestions/$(questionId)/answers/$(request.resource.data.solutionAnswerId));
-      allow delete: if false;
+      allow delete: if isModerator();
 
       match /answers/{answerId} {
         allow read: if isGoogleUser();
@@ -82,25 +95,41 @@ service cloud.firestore {
           && request.resource.data.text.size() >= 10
           && request.resource.data.text.size() <= 800
           && request.resource.data.createdAt == request.time;
-        allow update, delete: if false;
+        allow update: if false;
+        allow delete: if isModerator();
       }
     }
 
     // Avisos de contenido para revisión manual por la administración.
-    // Los usuarios no pueden leer los avisos de otras personas.
+    // Cualquier persona con Google puede denunciar; solo moderación puede leer.
     match /techReports/{reportId} {
       allow create: if isGoogleUser()
-        && request.resource.data.keys().hasOnly(['uid','resourceType','resourceId','reason','createdAt'])
-        && request.resource.data.keys().hasAll(['uid','resourceType','resourceId','reason','createdAt'])
+        && request.resource.data.keys().hasOnly(['uid','resourceType','resourceId','parentId','reason','createdAt'])
+        && request.resource.data.keys().hasAll(['uid','resourceType','resourceId','parentId','reason','createdAt'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.resourceType in ['question','answer','chat']
         && request.resource.data.resourceId is string
         && request.resource.data.resourceId.size() > 0
         && request.resource.data.resourceId.size() <= 80
+        && request.resource.data.parentId is string
+        && request.resource.data.parentId.size() <= 80
+        && (
+          (request.resource.data.resourceType == 'question' && request.resource.data.parentId == '')
+          || (request.resource.data.resourceType == 'answer' && request.resource.data.parentId.size() > 0)
+          || (request.resource.data.resourceType == 'chat'
+              && (musicRoom(request.resource.data.parentId) || request.resource.data.parentId == 'informatica'))
+        )
         && reportId == request.auth.uid + '_' + request.resource.data.resourceType + '_' + request.resource.data.resourceId
         && request.resource.data.reason == 'contenido_inapropiado'
         && request.resource.data.createdAt == request.time;
-      allow read, update, delete: if false;
+      allow read: if isModerator();
+      allow update: if isModerator()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','reviewedBy','reviewedAt'])
+        && request.resource.data.keys().hasOnly(['uid','resourceType','resourceId','parentId','reason','createdAt','status','reviewedBy','reviewedAt'])
+        && request.resource.data.status == 'revisada'
+        && request.resource.data.reviewedBy == request.auth.uid
+        && request.resource.data.reviewedAt == request.time;
+      allow delete: if false;
     }
 
     match /{document=**} { allow read, write: if false; }
