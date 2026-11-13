@@ -222,3 +222,10 @@
 .mod-preview p{overflow-wrap:anywhere;margin:8px 0}
 .mod-preview small{color:#baa4cf}
 @media(max-width:600px){.mod-action{flex:1 1 auto}}
+
+
+/* Botón de instalación: solo aparece cuando el navegador permite instalar. */
+.install-app{padding:8px 12px;min-height:36px;border-radius:999px;border:1px solid #bc83ef;background:linear-gradient(115deg,#a84ab8,#764bd9);color:#fff;font-size:12px;font-weight:750;white-space:nowrap}
+.install-app:hover{filter:brightness(1.14)}
+.install-app[hidden]{display:none!important}
+@media(max-width:500px){.install-app{padding:8px 9px;font-size:11px}.status{flex-wrap:wrap;justify-content:flex-end}}

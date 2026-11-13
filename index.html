@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#100a22">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
   <meta name="description" content="OndaChat: música, radio y conversaciones en un solo lugar.">
   <title>OndaChat · Música y comunidad</title>
   <link rel="stylesheet" href="./styles.css">
@@ -13,7 +16,7 @@
 <div class="shell">
   <header class="topbar">
     <a href="#inicio" class="brand"><span class="brand-icon">♫</span> Onda<span>Chat</span></a>
-    <div class="status"><span class="live">● Espacio musical</span><span id="mode-badge">Demo local</span></div>
+    <div class="status"><span class="live">● Espacio musical</span><span id="mode-badge">Demo local</span><button type="button" id="install-app" class="install-app" hidden>Instalar app</button></div>
   </header>
   <main id="inicio">
     <section class="intro">
@@ -80,5 +83,6 @@
   <footer>OndaChat · Primera versión de pruebas <span>Hecho con ♡ y buena música</span></footer>
 </div>
 <script type="module" src="./app.js"></script>
+<script src="./install.js" defer></script>
 </body>
 </html>

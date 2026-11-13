@@ -84,3 +84,15 @@ Hasta publicar esas reglas, los formularios de informática no podrán leer ni e
 - La eliminación de contenido se prueba primero con publicaciones de ejemplo; es irreversible, no un simple ocultado.
 - Retirar una respuesta aceptada puede dejar la pregunta marcada como resuelta hasta que su autor elija otra solución.
 - Falta un historial de auditoría del servidor, medidas antispam contra cuentas reales o anónimas, flujos de apelación y un sistema de bloqueo de usuarios.
+
+## Instalar OndaChat como aplicación (PWA)
+- En Chrome Android abre `https://kariciber.github.io/OndaChat/`, menú `⋮` → **Instalar aplicación** o **Añadir a pantalla de inicio**. Cuando el navegador lo permita también se verá el botón **Instalar app** en la web.
+- En Chrome/Edge escritorio utiliza el icono de instalación de la barra de direcciones, si se ofrece.
+- App instalable con iconos PNG de 192 y 512 píxeles, `manifest.webmanifest`, `install.js` y `sw.js`.
+- La interfaz pública básica puede cargarse desde caché sin red, pero **radio, Google Login, chats y foro requieren Internet**. El service worker solo almacena archivos públicos; **nunca** Firestore, datos del usuario ni recursos externos.
+- La PWA sigue siendo **beta**: antes de distribuirla en Google Play hay que cerrar temas de privacidad, moderación, antispam y pruebas.
+
+### Futuro empaquetado Android / Google Play
+- Aprovechar la cuenta de Play Console existente. Una opción es generar un proyecto Android con **Bubblewrap + Trusted Web Activity**, probar un APK y preparar un **AAB** para Play Console.
+- Para una TWA a pantalla completa, la verificación por **Digital Asset Links** requiere alojar `/.well-known/assetlinks.json` **en la raíz del dominio de la web**. Un GitHub Pages de proyecto (ruta `/OndaChat/`) no permite por sí solo colocar ese archivo en la raíz `kariciber.github.io`: habrá que preparar el sitio raíz o un dominio propio.
+- Conservar el keystore y el certificado de firma en lugar seguro. **Nunca subir claves privadas ni credenciales a GitHub**.
