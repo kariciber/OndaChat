@@ -39,6 +39,17 @@ export function mountTechSupport({container, firebaseContext, nickname, avatar})
     const value = typeof avatar === 'function' ? avatar() : null;
     return avatarIcons.includes(value) ? { avatar: value } : {};
   };
+  const addPost = async (ref,data) => {
+    try {
+      return await ctx.dbApi.addDoc(ref,data);
+    } catch(error) {
+      if(error?.code!=='permission-denied' || !('avatar' in data))throw error;
+      // Con las reglas antiguas se guardan los mensajes sin avatar hasta
+      // que Firebase tenga las reglas nuevas publicadas.
+      const {avatar:ignored,...legacy}=data;
+      return ctx.dbApi.addDoc(ref,legacy);
+    }
+  };
   const displayAuthor = data => (avatarIcons.includes(data.avatar) ? data.avatar+' ' : '')+short(data.nickname,24);
   const displayBy = data => 'Por '+displayAuthor(data);
   const root = create('section','tech-center');
@@ -175,7 +186,7 @@ export function mountTechSupport({container, firebaseContext, nickname, avatar})
       feedback.textContent='Publicando...';
       try {
         const {dbApi,db}=ctx;
-        await dbApi.addDoc(dbApi.collection(db,'techQuestions'),{
+        await addPost(dbApi.collection(db,'techQuestions'),{
           uid:user.uid,nickname:short(nickname(),24)||'Invitado',...avatarField(),category:category.value,
           title,details:desc,status:'abierta',createdAt:dbApi.serverTimestamp()
         });
@@ -318,7 +329,7 @@ export function mountTechSupport({container, firebaseContext, nickname, avatar})
       if(Date.now()-lastPublish<15000){feedback.textContent='Espera unos segundos antes de enviar otro mensaje.';return;}
       btn.disabled=true;feedback.textContent='Enviando...';
       try {
-        await dbApi.addDoc(answersRef,{uid:user.uid,nickname:short(nickname(),24)||'Invitado',...avatarField(),text,createdAt:dbApi.serverTimestamp()});
+        await addPost(answersRef,{uid:user.uid,nickname:short(nickname(),24)||'Invitado',...avatarField(),text,createdAt:dbApi.serverTimestamp()});
         lastPublish=Date.now();input.value='';feedback.textContent='Respuesta publicada.';
       } catch(err){console.error('Respuesta',err);feedback.textContent='No se pudo publicar. Revisa las reglas.';}
       finally {btn.disabled=false;}
@@ -366,7 +377,7 @@ export function mountTechSupport({container, firebaseContext, nickname, avatar})
       if(Date.now()-lastPublish<5000){feedback.textContent='Espera 5 segundos entre mensajes.';return;}
       send.disabled=true;feedback.textContent='Enviando...';
       try{
-        await dbApi.addDoc(room,{uid:user.uid,nickname:short(nickname(),24)||'Invitado',...avatarField(),text,createdAt:dbApi.serverTimestamp()});
+        await addPost(room,{uid:user.uid,nickname:short(nickname(),24)||'Invitado',...avatarField(),text,createdAt:dbApi.serverTimestamp()});
         lastPublish=Date.now();input.value='';feedback.textContent='';
       }catch(err){console.error('Chat IT',err);feedback.textContent='No se pudo enviar. Comprueba las reglas nuevas.';}
       finally{send.disabled=false;}
