@@ -29,6 +29,29 @@ function authFeedback(message = '') {
   feedback.textContent = message;
   feedback.hidden = !message;
 }
+function signedInGoogle() {
+  return Boolean(firebaseContext?.auth?.currentUser?.providerData?.some(p=>p.providerId === 'google.com'));
+}
+async function reportMusicMessage(roomId, messageId) {
+  if (!signedInGoogle() || !firebaseContext) {
+    authFeedback('Inicia sesión con Google para enviar una denuncia.');
+    return;
+  }
+  if (!confirm('¿Quieres enviar este mensaje a moderación?')) return;
+  const { dbApi, db, auth } = firebaseContext;
+  try {
+    const uid=auth.currentUser.uid;
+    const reportId=uid+'_chat_'+messageId;
+    await dbApi.setDoc(dbApi.doc(db,'techReports',reportId),{
+      uid,resourceType:'chat',resourceId:messageId,parentId:roomId,
+      reason:'contenido_inapropiado',createdAt:dbApi.serverTimestamp()
+    });
+    notice('Denuncia enviada. El equipo de moderación podrá revisarla.',true);
+  } catch(error) {
+    console.error('Denunciar mensaje musical',error);
+    notice('No se pudo registrar la denuncia. Comprueba las reglas de Firestore.',false);
+  }
+}
 function showMusicControls() {
   const chat = document.querySelector('.chat');
   chat.classList.remove('tech-active');
@@ -63,7 +86,18 @@ function draw(items) {
     const txt = document.createElement('div');
     txt.className = 'message-text';
     txt.textContent = clean(item.text, MAX_LENGTH);
-    head.append(author, time); body.append(head, txt); row.append(avatar, body); box.append(row);
+    head.append(author, time); body.append(head, txt);
+    if(item.docId && item.roomId && signedInGoogle() &&
+        item.uid !== firebaseContext?.auth?.currentUser?.uid) {
+      const flag=document.createElement('button');
+      flag.type='button';
+      flag.className='message-report';
+      flag.textContent='Denunciar';
+      flag.setAttribute('aria-label','Denunciar mensaje de '+author.textContent);
+      flag.addEventListener('click',()=>reportMusicMessage(item.roomId,item.docId));
+      body.append(flag);
+    }
+    row.append(avatar, body); box.append(row);
   }
   box.scrollTop = box.scrollHeight;
 }
@@ -255,6 +289,9 @@ function subscribeRoom(roomId) {
     const items = snapshot.docs.map(doc => {
       const data = doc.data();
       return {
+        docId:doc.id,
+        roomId,
+        uid:data.uid,
         nickname: data.nickname,
         text: data.text,
         createdAt: data.createdAt?.toDate?.()?.toISOString?.() || new Date().toISOString()
