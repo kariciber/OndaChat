@@ -9,7 +9,8 @@ const ROOMS = Object.freeze({
   pop: { title: 'Sala Pop 🎤', label: 'Pop' },
   rock: { title: 'Sala Rock 🎸', label: 'Rock' },
   electronica: { title: 'Sala Electrónica 🎛️', label: 'Electrónica' },
-  chill: { title: 'Sala Chill 🌙', label: 'Chill' }
+  chill: { title: 'Sala Chill 🌙', label: 'Chill' },
+  informatica: { title: 'Sala de Técnicos de Informática 💻', label: 'Técnicos de informática', preview: true }
 });
 let activeRoom = 'general', firebaseContext = null, unsubscribeRoom = null, roomGeneration = 0;
 const clean = (value, limit = 300) => String(value ?? '').trim().slice(0, limit);
@@ -66,6 +67,43 @@ if (!Array.isArray(messages)) messages = [];
 messages = messages.slice(-MAX_MESSAGES);
 draw(messages);
 
+function showPreviewRoom() {
+  if (unsubscribeRoom) {
+    unsubscribeRoom();
+    unsubscribeRoom = null;
+  }
+  ++roomGeneration;
+  mode = 'preview';
+  sendRemote = null;
+  el('send-btn').disabled = true;
+  el('chat-form').hidden = true;
+  el('mode-badge').textContent = 'Sala en desarrollo';
+  notice('Esta sala está en desarrollo. Aún no se pueden enviar mensajes.');
+
+  const container = el('messages');
+  container.replaceChildren();
+  const card = document.createElement('div');
+  card.className = 'dev-room';
+  const symbol = document.createElement('span');
+  symbol.className = 'dev-room-icon';
+  symbol.textContent = '💻';
+  const tag = document.createElement('span');
+  tag.className = 'dev-room-tag';
+  tag.textContent = 'PRÓXIMAMENTE';
+  const title = document.createElement('h3');
+  title.textContent = 'Técnicos de informática';
+  const description = document.createElement('p');
+  description.textContent = 'Un espacio para hablar de ordenadores, solucionar problemas y compartir conocimientos técnicos.';
+  const topics = document.createElement('p');
+  topics.className = 'dev-room-topics';
+  topics.textContent = '🖥️ Windows y Linux   ·   🌐 Redes   ·   🔧 Reparaciones   ·   🛡️ Seguridad   ·   💡 Programación';
+  const finalNote = document.createElement('p');
+  finalNote.className = 'dev-room-note';
+  finalNote.textContent = 'Estamos preparando esta sala. Las demás siguen disponibles para conversar.';
+  card.append(symbol,tag,title,description,topics,finalNote);
+  container.append(card);
+}
+
 function setRoom(roomId) {
   if (!Object.hasOwn(ROOMS, roomId)) return;
   activeRoom = roomId;
@@ -75,6 +113,11 @@ function setRoom(roomId) {
     button.classList.toggle('active', selected);
     button.setAttribute('aria-pressed', String(selected));
   });
+  if (ROOMS[roomId].preview) {
+    showPreviewRoom();
+    return;
+  }
+  el('chat-form').hidden = false;
   if (firebaseContext) {
     subscribeRoom(roomId);
   } else if (roomId !== 'general') {
@@ -172,7 +215,12 @@ audio.addEventListener('pause', () => player('Radio en pausa', 'Pulsa reproducir
 audio.addEventListener('error', () => player('Emisión no disponible', 'Comprueba el enlace directo al audio', false));
 
 function subscribeRoom(roomId) {
+  if (ROOMS[roomId]?.preview) {
+    showPreviewRoom();
+    return;
+  }
   if (!firebaseContext) return;
+  el('chat-form').hidden = false;
   if (unsubscribeRoom) {
     unsubscribeRoom();
     unsubscribeRoom = null;
