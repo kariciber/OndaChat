@@ -11,7 +11,7 @@
   "navigationDividerColor": "#100A22",
   "navigationDividerColorDark": "#100A22",
   "backgroundColor": "#100A22",
-  "enableNotifications": false,
+  "enableNotifications": true,
   "enableSiteSettingsShortcut": true,
   "fallbackType": "customtabs",
   "orientation": "default",
@@ -20,12 +20,12 @@
   "webManifestUrl": "https://kariciber.github.io/OndaChat/manifest.webmanifest",
   "startUrl": "/OndaChat/",
   "appVersionCode": 2,
-  "appVersionName": "1.0.1",
   "splashScreenFadeOutDuration": 300,
   "shortcuts": [],
   "signingKey": {
     "path": "./NO-SUBIR-CLAVES.keystore",
     "alias": "Ondachat"
   },
-  "generatorApp": "PWABuilder"
+  "generatorApp": "PWABuilder",
+  "appVersion": "1.0.1"
 }
