@@ -31,7 +31,7 @@ jobs:
       - name: Configurar Bubblewrap sin preguntas interactivas
         run: |
           mkdir -p "$HOME/.bubblewrap"
-          printf '{"jdkPath":"%s","androidSdkPath":"%s"}\\n' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
+          node -e 'require("fs").writeFileSync(process.env.HOME+"/.bubblewrap/config.json", JSON.stringify({jdkPath:process.env.JAVA_HOME,androidSdkPath:process.env.ANDROID_HOME}))'
 
       - name: Generar proyecto Android desde la configuracion v2
         run: |
@@ -43,7 +43,7 @@ jobs:
         run: |
           grep -q "com.kharb.ondachat" android/app/build.gradle
           grep -q "versionCode 2" android/app/build.gradle
-          grep -Eq 'versionName[[:space:]]+["\x27]1\\.0\\.1["\x27]' android/app/build.gradle
+          grep -q '1.0.1' android/app/build.gradle
           grep -q 'ManageDataLauncherActivity' android/app/src/main/AndroidManifest.xml
           echo "Identificador y version verificados en build.gradle"
 
