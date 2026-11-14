@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kharb.ondachat",
+      "sha256_cert_fingerprints": [
+        "2F:0F:4E:F2:99:48:83:CF:01:F0:8D:14:28:BC:EC:2B:25:FA:76:03:82:C7:0A:A7:31:7A:4F:31:28:BE:0B:BA"
+      ]
+    }
+  }
+]
