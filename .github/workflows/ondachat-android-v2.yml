@@ -28,18 +28,23 @@ jobs:
       - name: Instalar Bubblewrap
         run: npm install --global @bubblewrap/cli
 
+      - name: Configurar Bubblewrap sin preguntas interactivas
+        run: |
+          mkdir -p "$HOME/.bubblewrap"
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}\\n' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
+
       - name: Generar proyecto Android desde la configuracion v2
         run: |
           mkdir -p android
           cp android-v2/twa-manifest.json android/twa-manifest.json
-          bubblewrap update --manifest=android/twa-manifest.json
+          bubblewrap update --skipVersionUpgrade --manifest=android/twa-manifest.json
 
       - name: Confirmar identificador y version antes de compilar
         run: |
           grep -q "com.kharb.ondachat" android/app/build.gradle
           grep -q "versionCode 2" android/app/build.gradle
-          grep -q "versionName '1.0.1'" android/app/build.gradle
-          grep -q "enableSiteSettingsShortcut: true" android/app/build.gradle || grep -q "enableSiteSettingsShortcut: 'true'" android/app/build.gradle
+          grep -Eq 'versionName[[:space:]]+["\x27]1\\.0\\.1["\x27]' android/app/build.gradle
+          grep -q 'ManageDataLauncherActivity' android/app/src/main/AndroidManifest.xml
           echo "Identificador y version verificados en build.gradle"
 
       - name: Compilar AAB sin firmar
