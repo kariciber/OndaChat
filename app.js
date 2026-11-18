@@ -510,7 +510,7 @@ async function startRealtimeChat() {
         console.error('Google login', error);
         const hints = {
           'auth/operation-not-allowed': 'Activa Google en Firebase > Authentication > Método de acceso.',
-          'auth/unauthorized-domain': 'Autoriza kariciber.github.io en Authentication > Configuración.',
+          'auth/unauthorized-domain': 'Autoriza ondachat.esencianaturalkharb.com en Authentication > Configuración.',
           'auth/popup-blocked': 'El navegador bloqueó la ventana. Prueba en Chrome o permite ventanas emergentes.',
           'auth/popup-closed-by-user': 'Has cerrado la ventana de acceso a Google.',
           'auth/account-exists-with-different-credential': 'Esta cuenta ya usa otro método de acceso.'
